@@ -13,7 +13,6 @@
 #include "HUD/PlayerWeaponHUDWidget.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "Sound/SoundWave.h"
 
 APlayerCharacter::APlayerCharacter()
 {
