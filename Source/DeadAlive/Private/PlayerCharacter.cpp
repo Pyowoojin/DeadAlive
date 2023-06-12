@@ -89,7 +89,7 @@ void APlayerCharacter::BeginPlay()
 		{
 			HUDOverlay->AddToViewport(0);
 			HUDOverlay->SetVisibility(ESlateVisibility::Visible);
-			WeaponHUDWidget = Cast<UPlayerWeaponHUDWidget>(HUDOverlay->GetWidgetFromName(TEXT("BP_AmmoCount")));
+			WeaponHUDWidget = Cast<UPlayerWeaponHUDWidget>(HUDOverlay->GetWidgetFromName(TEXT("BP_AmmoCount2")));
 			RefreshAllTypeOfAmmoWidget();
 		}
 	}
