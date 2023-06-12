@@ -18,7 +18,6 @@ UE5.vcxproj
 # Belica
 */ParagonLtBelica/
 */StarterContent/
-*/Ch10_nonPBR.fbx
 
 # Precompiled Headers
 *.gch
