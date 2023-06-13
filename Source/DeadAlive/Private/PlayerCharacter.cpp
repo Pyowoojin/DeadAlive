@@ -14,6 +14,12 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 
+/*if(GEngine)
+{
+	GEngine->Add	
+}
+*/
+
 APlayerCharacter::APlayerCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -172,7 +178,7 @@ void APlayerCharacter::CharMove(const FInputActionValue& Value)
 
 void APlayerCharacter::Look(const FInputActionValue& Value){
 	const FVector2D LookAxisVector = Value.Get<FVector2D>();
-	AddControllerYawInput(LookAxisVector.X * DefaultTurnRate);
+	AddControllerYawInput(-LookAxisVector.X * DefaultTurnRate);
 	AddControllerPitchInput(LookAxisVector.Y * DefaultTurnRate);
 }
 
@@ -443,11 +449,18 @@ void APlayerCharacter::ShotKeyPressed(const FInputActionValue& Value)
 			FHitResult ScreenTraceHit;
 			const FVector FireStartPoint = CrossHairWorldPosition;
 			const FVector FireEndPoint = CrossHairWorldPosition + CrossHairWorldDirection * WeaponRange;
+
+			if(GEngine && ScreenTraceHit.GetActor() != nullptr)
+			{
+				GEngine->AddOnScreenDebugMessage(29, 2.f, FColor::Turquoise, ScreenTraceHit.GetActor()->GetName());
+				UE_LOG(LogTemp, Warning, TEXT("TASD!@#!"));
+			}
 			
 			// 크로스헤어에서 위치에서 라인 트레이스 발사
 			GetWorld()->LineTraceSingleByChannel(ScreenTraceHit, FireStartPoint, FireEndPoint, ECC_Visibility);
 			// 총 발사 함수 호출
 			CharAttribute->GetEquippedWeapon()->GunFire(ScreenTraceHit);
+			
 			
 			RefreshTheCurrentAmmoWidget();
 
