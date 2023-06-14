@@ -41,6 +41,8 @@ APlayerCharacter::APlayerCharacter()
 	bUseControllerRotationYaw = true;
 	bUseControllerRotationRoll = false;
 
+	this->bUseControllerRotationYaw = true;
+
 	// 마우스 말고 캐릭터가 이동하는 (키보드) 방향으로 회전하게 한다.
 	GetCharacterMovement()->bOrientRotationToMovement = false;
 	// 회전 속도

@@ -27,6 +27,16 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaTime)
 		FString Dir = FString::SanitizeFloat(Direction);
 		bIsInAir = PlayerCharacterMovement->IsFalling();
 
+		if(GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(7778, -1, FColor::Red, FString::Printf(TEXT("%f"), Direction));
+		}
+
+		if(GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(7678, -1, FColor::Yellow, FString::Printf(TEXT("%f"), GroundSpeed));
+		}
+
 		// 플레이어가 움직이고 있을 때에만 업데이트함
 		if(PlayerCharacter->GetVelocity().Size() > 0.f)
 			LastMovementDir = Direction;
@@ -119,6 +129,6 @@ void UPlayerAnimInstance::Lean(float DeltaTime)
 
 	if(GEngine)
 	{
-		GEngine->AddOnScreenDebugMessage(7778, -1, FColor::Red, FString::Printf(TEXT("%f"), Delta.Yaw));
+		GEngine->AddOnScreenDebugMessage(7779, -1, FColor::Blue, FString::Printf(TEXT("%f"), YawDelta));
 	}
 }
