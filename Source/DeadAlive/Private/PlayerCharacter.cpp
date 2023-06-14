@@ -163,6 +163,11 @@ void APlayerCharacter::Tick(float DeltaTime)
 
 	// 주변에 아이템이 있을 때만 CrossHair LineTrace Enable!
 	TraceForItems();
+
+	if(GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(121, -1.f, FColor::Cyan, FString::Printf(TEXT("%f : %f : %f"), ClipTransform.GetTranslation().X,ClipTransform.GetTranslation().Y, ClipTransform.GetTranslation().Z));		
+	}
 }
 
 void APlayerCharacter::CharMove(const FInputActionValue& Value)
@@ -422,6 +427,8 @@ void APlayerCharacter::GrabClip()
 {
 	if(CharAttribute->GetEquippedWeapon() == nullptr) return;
 	if(HandSceneComponent == nullptr) return;
+
+	UE_LOG(LogTemp, Warning, TEXT("실행"));
 
 	// 장착된 무기의 탄창 본 인덱스 구하기 
 	const int32 ClipBoneIndex { CharAttribute->GetEquippedWeapon()->GetSkeletalMesh()->GetBoneIndex(CharAttribute->GetEquippedWeapon()->GetClipBoneName())};
