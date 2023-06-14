@@ -27,21 +27,18 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaTime)
 		FString Dir = FString::SanitizeFloat(Direction);
 		bIsInAir = PlayerCharacterMovement->IsFalling();
 
-		if(GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(7778, -1, FColor::Red, FString::Printf(TEXT("%f"), Direction));
-		}
-
-		if(GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(7678, -1, FColor::Yellow, FString::Printf(TEXT("%f"), GroundSpeed));
-		}
-
 		// 플레이어가 움직이고 있을 때에만 업데이트함
 		if(PlayerCharacter->GetVelocity().Size() > 0.f)
 			LastMovementDir = Direction;
 
 		bAiming = PlayerCharacter->GetAiming();
+		if(GEngine)
+		{
+			if(bAiming)
+				GEngine->AddOnScreenDebugMessage(7678, -1, FColor::Yellow, FString::Printf(TEXT("조준하는 중")));
+			else
+				GEngine->AddOnScreenDebugMessage(7678, -1, FColor::Yellow, FString::Printf(TEXT("조준 안 하는 중")));
+		}
 
 		if(bReloading)
 		{
@@ -126,9 +123,4 @@ void UPlayerAnimInstance::Lean(float DeltaTime)
 	const float Interp{FMath::FInterpTo(YawDelta, Target, DeltaTime, 6.f)};
 
 	YawDelta = FMath::Clamp(Interp, -90.f, 90.f);
-
-	if(GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(7779, -1, FColor::Blue, FString::Printf(TEXT("%f"), YawDelta));
-	}
 }
