@@ -21,7 +21,6 @@ void AShooterPlayerController::BeginPlay()
 			WeaponHUDWidget = Cast<UPlayerWeaponHUDWidget>(HUDOverlay->GetWidgetFromName(TEXT("BP_AmmoCount2")));
 			if(WeaponHUDWidget)
 			{
-				
 				UE_LOG(LogTemp, Warning, TEXT("캐스팅 성공"));
 			}
 			else

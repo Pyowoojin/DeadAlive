@@ -297,7 +297,6 @@ void APlayerCharacter::FireButtonPressed()
 	{
 		StartFireTimer();
 	}
-	
 }
 
 void APlayerCharacter::FireButtonReleased()
