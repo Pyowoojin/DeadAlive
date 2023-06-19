@@ -1,11 +1,11 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Items/BaseItem.h"
 #include "BaseWeapon.generated.h"
 
+class UTextBlock;
+class UImage;
 class UWeaponSlot;
 class UWeaponInfoWidget;
 class UPrimitiveComponent;
@@ -74,6 +74,20 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess ="true"))
 	bool bMovingClip = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UWeaponSlot* WeaponSlot;
+	/*UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UWeaponSlot* WeaponSlot;*/
+
+	// HUD를 위한 변수들
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Custom", meta = (AllowPrivateAccess = "true"))
+	UTexture2D* WeaponIcon;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Custom", meta = (AllowPrivateAccess = "true"))
+	UTexture2D* BackgroundImage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Custom", meta = (AllowPrivateAccess = "true"))
+	FName AmmoCount;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Custom", meta = (AllowPrivateAccess = "true"))
+	UTexture2D* AmmoImage;
 };

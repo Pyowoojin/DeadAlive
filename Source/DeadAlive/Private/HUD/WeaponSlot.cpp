@@ -2,6 +2,8 @@
 
 
 #include "HUD/WeaponSlot.h"
+
+#include "Components/Image.h"
 #include "Components/TextBlock.h"
 
 void UWeaponSlot::Init()
@@ -11,4 +13,17 @@ void UWeaponSlot::Init()
 		FText TextString = FText::FromString(FString::Printf(TEXT("0")));
 		WeaponAmmoCount->SetText(TextString);
 	}
+
+	if(BackGroundImage)
+	{
+		BackGroundImage->SetVisibility(ESlateVisibility::Hidden);
+	}
+	if(WeaponIcon)
+	{
+		WeaponIcon->SetVisibility(ESlateVisibility::Hidden);
+	}
+}
+
+void UWeaponSlot::RefreshSlot()
+{
 }

@@ -10,6 +10,7 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "Attributes/WeaponAttributes.h"
 #include "PlayerCharacter.h"
+#include "Components/Image.h"
 #include "HUD/WeaponInfoWidget.h"
 
 ABaseWeapon::ABaseWeapon()
@@ -18,6 +19,8 @@ ABaseWeapon::ABaseWeapon()
 	
 	FirePoint = CreateDefaultSubobject<USceneComponent>(TEXT("FirePoint"));
 	FirePoint->SetupAttachment(GetRootComponent());
+	
+	
 	
 	WeaponAttributes = CreateDefaultSubobject<UWeaponAttributes>(TEXT("WeaponAttributes"));
 	

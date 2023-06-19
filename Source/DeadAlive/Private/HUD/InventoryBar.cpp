@@ -2,6 +2,7 @@
 
 
 #include "HUD/InventoryBar.h"
+#include "Components/TextBlock.h"
 #include "HUD/WeaponSlot.h"
 
 UInventoryBar::UInventoryBar(const FObjectInitializer &ObjectInitializer) : Super(ObjectInitializer)
@@ -32,10 +33,8 @@ void UInventoryBar::InsertWeapon(ABaseWeapon* Weapon)
 
 void UInventoryBar::InitSlot(const UInventoryBar* InventoryBar)
 {
-	/*if(DefaultWeaponSlot)
-	{
-		DefaultWeaponSlot->Init();
-	}*/
+	// overlay 슬롯들 매핑시켜주기
+	
 	DefaultWeaponSlott = Cast<UWeaponSlot>(InventoryBar->GetWidgetFromName(TEXT("DefaultWeaponSlot")));
 	SlotArray.Add(DefaultWeaponSlott);
 	WeaponSlot01 = Cast<UWeaponSlot>(InventoryBar->GetWidgetFromName(TEXT("WeaponSlot1")));
@@ -48,11 +47,25 @@ void UInventoryBar::InitSlot(const UInventoryBar* InventoryBar)
 	SlotArray.Add(WeaponSlot04);
 	WeaponSlot05 = Cast<UWeaponSlot>(InventoryBar->GetWidgetFromName(TEXT("WeaponSlot5")));
 	SlotArray.Add(WeaponSlot05);
-
+	
+	TextSlotArray.Add(Weapon1Text);
+	TextSlotArray.Add(Weapon2Text);
+	TextSlotArray.Add(Weapon3Text);
+	TextSlotArray.Add(Weapon4Text);
+	TextSlotArray.Add(Weapon5Text);
+	
 	for(int i = 0; i < MaxSlotSize; i++)
 	{
+		if(i == Pointer)
+		{
+			TextSlotArray[i]->SetColorAndOpacity(FLinearColor::Red);
+		}
+		
 		if(SlotArray[i])
+		{
 			SlotArray[i]->Init();
+			SlotCheck[i] = true;
+		}
 	}
 }
 

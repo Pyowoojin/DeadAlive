@@ -238,4 +238,7 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SLATE_CULL_WIDGETS, meta = (AllowPrivateAccess = "true"))
 	UInventoryBar* InventoryBar;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Custom", meta = (AllowPrivateAccess = "true"))
+	int32 SlotPointer = 0;
 };
