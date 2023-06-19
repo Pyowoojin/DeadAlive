@@ -6,6 +6,7 @@
 #include "Items/BaseItem.h"
 #include "BaseWeapon.generated.h"
 
+class UWeaponSlot;
 class UWeaponInfoWidget;
 class UPrimitiveComponent;
 class UWeaponAttributes;
@@ -72,4 +73,7 @@ private:
 	// 움직이고 있는지를 확인하는 변수
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess ="true"))
 	bool bMovingClip = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UWeaponSlot* WeaponSlot;
 };

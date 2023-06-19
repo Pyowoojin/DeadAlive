@@ -7,15 +7,6 @@
 #include "Interfaces/PickupInterface.h"
 #include "PlayerCharacter.generated.h"
 
-UENUM(BlueprintType)
-enum class ECombatState : uint8
-{
-	ECS_Unoccupied UMETA(DisplayName = "Unoccupied"),
-	ECS_FireTimerInProgress UMETA(DisplayName = "FireTimerInProgress"),
-	ECS_Reloading UMETA(DisplayName = "Reloading"),
-	ECS_Max UMETA(DisplayName = "DefaultMax")
-};
-
 class USpringArmComponent;
 class UCameraComponent;
 class UInputMappingContext;
@@ -26,6 +17,17 @@ class ABaseWeapon;
 class UPlayerWeaponHUDWidget;
 class UUserWidget;
 class USoundWave;
+class UWeaponSlot;
+class UInventoryBar;
+
+UENUM(BlueprintType)
+enum class ECombatState : uint8
+{
+	ECS_Unoccupied UMETA(DisplayName = "Unoccupied"),
+	ECS_FireTimerInProgress UMETA(DisplayName = "FireTimerInProgress"),
+	ECS_Reloading UMETA(DisplayName = "Reloading"),
+	ECS_Max UMETA(DisplayName = "DefaultMax")
+};
 
 UCLASS()
 class DEADALIVE_API APlayerCharacter : public ACharacter, public IPickupInterface
@@ -233,4 +235,7 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SLATE_CULL_WIDGETS, meta = (AllowPrivateAccess = "true"))
 	UPlayerWeaponHUDWidget* WeaponHUDWidget;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SLATE_CULL_WIDGETS, meta = (AllowPrivateAccess = "true"))
+	UInventoryBar* InventoryBar;
 };

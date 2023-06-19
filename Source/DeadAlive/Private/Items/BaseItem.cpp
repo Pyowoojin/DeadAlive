@@ -30,6 +30,7 @@ ABaseItem::ABaseItem()
 
 	PickupWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("PickupWidget"));
 	PickupWidget->SetupAttachment(GetRootComponent());
+	PickupWidget->SetRelativeTransform(FTransform(FVector3d(0.f, 0.f, 90.f)));
 }
 
 void ABaseItem::BeginPlay()

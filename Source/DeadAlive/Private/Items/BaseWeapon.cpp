@@ -32,6 +32,7 @@ void ABaseWeapon::BeginPlay()
 	{
 		WeaponInfo->SetItemName(WeaponAttributes->GetItemName());
 	}
+	DisableCustomDepth();
 }
 
 void ABaseWeapon::ItemDivestiture()
@@ -95,13 +96,14 @@ void ABaseWeapon::NoticeRangeBeginOverlap(UPrimitiveComponent* OverlappedCompone
 	}
 }
 
-void ABaseWeapon::PickUpItem(APlayerCharacter* Player)
-{
+void ABaseWeapon::PickUpItem(APlayerCharacter* Player){
+
+	if(Player->GetCharAttribute()->GetEquippedWeapon()) return;
 	Super::PickUpItem(Player);
+	
 	Player->GetCharAttribute()->SetEquippedWeapon(this);
 	ItemAcquisition(Player->GetMesh(), Player);
 	// DisableCustomDepth();
-	
 }
 
 void ABaseWeapon::PlayFireSound()

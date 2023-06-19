@@ -32,14 +32,7 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaTime)
 			LastMovementDir = Direction;
 
 		bAiming = PlayerCharacter->GetAiming();
-		if(GEngine)
-		{
-			if(bAiming)
-				GEngine->AddOnScreenDebugMessage(7678, -1, FColor::Yellow, FString::Printf(TEXT("조준하는 중")));
-			else
-				GEngine->AddOnScreenDebugMessage(7678, -1, FColor::Yellow, FString::Printf(TEXT("조준 안 하는 중")));
-		}
-
+		
 		if(bReloading)
 		{
 			OffsetState = EOffsetState::EOS_Reloading;

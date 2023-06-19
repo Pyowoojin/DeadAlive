@@ -12,11 +12,13 @@
 #include "Engine/World.h"
 #include "HUD/PlayerWeaponHUDWidget.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "HUD/InventoryBar.h"
 #include "Kismet/GameplayStatics.h"
 
-/*if(GEngine)
+/*
+if(GEngine)
 {
-	GEngine->Add	
+	GEngine->AddOnScreenDebugMessage(171, -1.f, FColor::Black, TEXT("hello"));
 }
 */
 
@@ -98,10 +100,29 @@ void APlayerCharacter::BeginPlay()
 			HUDOverlay->AddToViewport(0);
 			HUDOverlay->SetVisibility(ESlateVisibility::Visible);
 			WeaponHUDWidget = Cast<UPlayerWeaponHUDWidget>(HUDOverlay->GetWidgetFromName(TEXT("BP_AmmoCount2")));
+
+			InventoryBar = Cast<UInventoryBar>(HUDOverlay->GetWidgetFromName(TEXT("InventoryBarCopy")));
+			if(InventoryBar)
+			{
+				InventoryBar->InitSlot(InventoryBar);
+				if(GEngine)
+				{
+					GEngine->AddOnScreenDebugMessage(1733, 5.f, FColor::Black, TEXT("Cast 성공"));
+				}
+			}
+			else
+			{
+				if(GEngine)
+				{
+					GEngine->AddOnScreenDebugMessage(1734, 5.f, FColor::Black, TEXT("Cast 실패"));
+				}
+			}
+
+
 			RefreshAllTypeOfAmmoWidget();
 		}
 	}
-
+	
 	// 뷰포트의 사이즈와 스크린의 가운데 위치를 미리 구함
 	GetViewPortSize();
 	bScreenToWorld = GetScreenCenterToConvertWorld();
@@ -163,11 +184,6 @@ void APlayerCharacter::Tick(float DeltaTime)
 
 	// 주변에 아이템이 있을 때만 CrossHair LineTrace Enable!
 	TraceForItems();
-
-	if(GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(121, -1.f, FColor::Cyan, FString::Printf(TEXT("%f : %f : %f"), ClipTransform.GetTranslation().X,ClipTransform.GetTranslation().Y, ClipTransform.GetTranslation().Z));		
-	}
 }
 
 void APlayerCharacter::CharMove(const FInputActionValue& Value)

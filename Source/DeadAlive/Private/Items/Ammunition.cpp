@@ -6,6 +6,7 @@
 
 AAmmunition::AAmmunition()
 {
+	Skm->SetSimulatePhysics(true);
 	ItemAttributes = CreateDefaultSubobject<UWeaponAttributes>("ItemAttributes");
 }
 
