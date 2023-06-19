@@ -72,6 +72,12 @@ protected:
 	void RunKeyPressed(const FInputActionValue& Value);
 	void AimKeyPressed(const FInputActionValue& Value);
 	void ShotKeyPressed(const FInputActionValue& Value);
+	void NumKey1Pressed();
+	void NumKey2Pressed();
+	void NumKey3Pressed();
+	void NumKey4Pressed();
+	void NumKey5Pressed();
+	
 	/* 입력 함수 END*/
 
 	UPROPERTY(VisibleAnywhere)
@@ -150,6 +156,19 @@ private:
 	UInputAction* InputShotChange;
 	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputAction* InputReload;
+
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* NumKey1;
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* NumKey2;
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* NumKey3;
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* NumKey4;
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* NumKey5;
+
+	
 	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputMappingContext* InputMapping;
 

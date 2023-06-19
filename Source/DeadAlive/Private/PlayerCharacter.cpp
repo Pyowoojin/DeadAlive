@@ -495,7 +495,6 @@ void APlayerCharacter::ShotKeyPressed(const FInputActionValue& Value)
 		FireMontage();
 	}
 }
-
 void APlayerCharacter::FireMontage()
 {
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
@@ -630,6 +629,31 @@ void APlayerCharacter::CameraAiming(float DeltaTime)
 	MainCam->SetFieldOfView(CurrentCameraFOV);
 }
 
+
+void APlayerCharacter::NumKey1Pressed()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Num1Press"));
+}
+
+void APlayerCharacter::NumKey2Pressed()
+{
+}
+
+void APlayerCharacter::NumKey3Pressed()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Num3Press"));
+	
+}
+
+void APlayerCharacter::NumKey4Pressed()
+{
+}
+
+void APlayerCharacter::NumKey5Pressed()
+{
+}
+
+
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -647,4 +671,10 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	Input->BindAction(InputShotChange, ETriggerEvent::Started, this, &APlayerCharacter::ShootingModeChange);
 	Input->BindAction(InputAim, ETriggerEvent::Started, this, &APlayerCharacter::AimKeyPressed);
 	Input->BindAction(InputAim, ETriggerEvent::Canceled, this, &APlayerCharacter::AimKeyPressed);
+	Input->BindAction(NumKey1,  ETriggerEvent::Triggered, this, &APlayerCharacter::NumKey1Pressed);
+	Input->BindAction(NumKey2,  ETriggerEvent::Triggered, this, &APlayerCharacter::NumKey2Pressed);
+	Input->BindAction(NumKey3,  ETriggerEvent::Triggered, this, &APlayerCharacter::NumKey3Pressed);
+	Input->BindAction(NumKey4,  ETriggerEvent::Triggered, this, &APlayerCharacter::NumKey4Pressed);
+	Input->BindAction(NumKey5,  ETriggerEvent::Triggered, this, &APlayerCharacter::NumKey5Pressed);
+	
 }
