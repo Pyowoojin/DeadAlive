@@ -13,6 +13,12 @@
 #include "Components/Image.h"
 #include "HUD/WeaponInfoWidget.h"
 
+void ABaseWeapon::IPickUpItem(ABaseWeapon* Weapon)
+{
+	IPickupInterface::IPickUpItem(Weapon);
+	UE_LOG(LogTemp, Warning, TEXT("그거받음ㅋ"));
+}
+
 ABaseWeapon::ABaseWeapon()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -106,7 +112,7 @@ void ABaseWeapon::PickUpItem(APlayerCharacter* Player){
 	
 	Player->GetCharAttribute()->SetEquippedWeapon(this);
 	ItemAcquisition(Player->GetMesh(), Player);
-	// DisableCustomDepth();
+	
 }
 
 void ABaseWeapon::PlayFireSound()

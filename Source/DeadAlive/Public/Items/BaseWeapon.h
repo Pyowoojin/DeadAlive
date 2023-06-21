@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Interfaces/PickupInterface.h"
 #include "Items/BaseItem.h"
 #include "BaseWeapon.generated.h"
 
@@ -15,11 +16,14 @@ class UGameplayStatics;
 class UParticleSystem;
 
 UCLASS()
-class DEADALIVE_API ABaseWeapon : public ABaseItem
+class DEADALIVE_API ABaseWeapon : public ABaseItem, public IPickupInterface
 {
 	GENERATED_BODY()
 
 public :
+
+	virtual void IPickUpItem(ABaseWeapon* Weapon) override;
+	
 	ABaseWeapon();
 	virtual void BeginPlay() override;
 	void PlayFireSound();
@@ -36,6 +40,13 @@ public :
 	void SetCollisionWhenItemChange();
 	FORCEINLINE FName GetClipBoneName() const { return ClipBoneName; }
 	FORCEINLINE void SetMovingClip(bool Move) { bMovingClip = Move; }
+
+	// Slot HUD를 위한 함수
+
+	FORCEINLINE UTexture2D* GetBackgroundImage() const { return BackgroundImage; }
+	FORCEINLINE UTexture2D* GetAmmoImage() const { return AmmoImage; }
+	FORCEINLINE UTexture2D* GetWeaponIcon() const { return WeaponIcon; }
+	FORCEINLINE FName GetAmmoCount() const { return AmmoCount; }
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -77,7 +88,7 @@ private:
 	/*UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UWeaponSlot* WeaponSlot;*/
 
-	// HUD를 위한 변수들
+	// WeaponSlot을 위한 변수들
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Custom", meta = (AllowPrivateAccess = "true"))
 	UTexture2D* WeaponIcon;

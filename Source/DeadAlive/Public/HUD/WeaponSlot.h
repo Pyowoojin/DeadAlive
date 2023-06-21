@@ -23,7 +23,7 @@ public :
 	FORCEINLINE void SetUniqueNumber(int8 SetNum) { UniqueNum = SetNum; }*/
 
 	void Init();
-	void RefreshSlot();
+	void RefreshSlot(class ABaseWeapon* Weapon);
 	
 private :
 	UPROPERTY(VisibleAnywhere, Category = Custom, meta = (AllowPrivateAccess = "true"))

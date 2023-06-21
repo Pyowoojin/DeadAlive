@@ -62,6 +62,7 @@ protected:
 	virtual void BeginPlay() override;
 	void TraceForItems();
 	virtual void OverlappingItem(class ABaseItem* Item) override;
+	// virtual void OverlappingItem_Implementation(class ABaseItem* Item) override;
 	void CameraAiming(float DeltaTime);
 
 	/* 입력 콜백 함수 */
@@ -257,7 +258,4 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SLATE_CULL_WIDGETS, meta = (AllowPrivateAccess = "true"))
 	UInventoryBar* InventoryBar;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Custom", meta = (AllowPrivateAccess = "true"))
-	int32 SlotPointer = 0;
 };

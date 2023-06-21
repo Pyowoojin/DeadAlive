@@ -13,6 +13,7 @@
 #include "HUD/PlayerWeaponHUDWidget.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "HUD/InventoryBar.h"
+#include "Items/Ammunition.h"
 #include "Kismet/GameplayStatics.h"
 
 /*
@@ -211,12 +212,23 @@ void APlayerCharacter::EKeyPressed()
 	if(CombatState != ECombatState::ECS_Unoccupied) return;
 	// 오버랩된 아이템이 있으면 실행 && 손에 든 총이 없으면 실행 (X), WeaponHUD 갱신
 	// 아이템일 경우와, 총일 경우를 나누어야 함
+	
 	if(CharAttribute && CharAttribute->GetOverlappedItem())
 	{
 		//ABaseWeapon* Weapon = Cast<ABaseWeapon>(CharAttribute->GetOverlappedItem());
 		ABaseItem* Item = Cast<ABaseItem>(CharAttribute->GetOverlappedItem());
+		// 무기일 경우 InventoryBar의 WeaponArray에 넣어줄거임
+		if(Item->IsA(ABaseWeapon::StaticClass()))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("무기 맞음"));
+			ABaseWeapon* PassingWeapon = Cast<ABaseWeapon>(Item);
+			InventoryBar->InsertWeapon(PassingWeapon);
+		}
 		Item->PickUpItem(this);
 		RefreshAllTypeOfAmmoWidget();
+
+
+		
 		
 		// 무기의 이름과 그 무기가 가진 총알 개수를 갱신한다.
 		if(WeaponHUDWidget && CharAttribute->GetEquippedWeapon() != nullptr)
@@ -225,7 +237,6 @@ void APlayerCharacter::EKeyPressed()
 			WeaponHUDWidget->SetCurrentAmmoNameText(CharAttribute->GetEquippedWeapon()->GetWeaponAttributes()->GetItemName());
 			RefreshAllTypeOfAmmoWidget();
 		}
-
 	}
 
 	// 손에 들고 있는 무기가 있다면, 무기를 내려놓음
@@ -615,6 +626,15 @@ void APlayerCharacter::OverlappingItem(ABaseItem* Item)
 	}
 }
 
+// 삭제해
+/*void APlayerCharacter::OverlappingItem_Implementation(ABaseItem* Item)
+{
+	if(CharAttribute)
+	{
+		CharAttribute->SetOverlapItem(Item);
+	}
+}*/
+
 // 줌 인 - 아웃시 카메라 부드럽게 하기
 void APlayerCharacter::CameraAiming(float DeltaTime)
 {
@@ -632,25 +652,28 @@ void APlayerCharacter::CameraAiming(float DeltaTime)
 
 void APlayerCharacter::NumKey1Pressed()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Num1Press"));
+	InventoryBar->SetPointerLocation(1);
 }
 
 void APlayerCharacter::NumKey2Pressed()
 {
+	InventoryBar->SetPointerLocation(2);
 }
 
 void APlayerCharacter::NumKey3Pressed()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Num3Press"));
+	InventoryBar->SetPointerLocation(3);
 	
 }
 
 void APlayerCharacter::NumKey4Pressed()
 {
+	InventoryBar->SetPointerLocation(4);
 }
 
 void APlayerCharacter::NumKey5Pressed()
 {
+	InventoryBar->SetPointerLocation(5);
 }
 
 
@@ -665,7 +688,6 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	Input->BindAction(InputRun, ETriggerEvent::Triggered, this, &APlayerCharacter::RunKeyPressed);
 	Input->BindAction(InputRun, ETriggerEvent::None, this, &APlayerCharacter::RunKeyPressed);
 	Input->BindAction(InputReload, ETriggerEvent::Triggered, this, &APlayerCharacter::ReloadButtonPressed);
-	// Input->BindAction(InputShot, ETriggerEvent::Started, this, &APlayerCharacter::ShotKeyPressed);
 	Input->BindAction(InputShot, ETriggerEvent::Triggered, this, &APlayerCharacter::FireButtonPressed);
 	Input->BindAction(InputShot, ETriggerEvent::Completed, this, &APlayerCharacter::FireButtonReleased);
 	Input->BindAction(InputShotChange, ETriggerEvent::Started, this, &APlayerCharacter::ShootingModeChange);

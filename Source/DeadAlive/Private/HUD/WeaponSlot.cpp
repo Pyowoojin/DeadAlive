@@ -3,8 +3,12 @@
 
 #include "HUD/WeaponSlot.h"
 
+#include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
+#include "HUD/InventoryBar.h"
+#include "Items/BaseWeapon.h"
+#include "Styling/SlateBrush.h"
 
 void UWeaponSlot::Init()
 {
@@ -24,6 +28,24 @@ void UWeaponSlot::Init()
 	}
 }
 
-void UWeaponSlot::RefreshSlot()
+void UWeaponSlot::RefreshSlot(ABaseWeapon* Weapon)
 {
+	// BackGroundImage->Brush = Weapon->GetWeaponIcon();
+
+	FSlateBrush Brush;
+	Brush.SetResourceObject(Weapon->GetBackgroundImage());
+	BackGroundImage->SetBrush(Brush);
+	BackGroundImage->SetVisibility(ESlateVisibility::Visible);
+
+	UE_LOG(LogTemp, Warning, TEXT("Refresh"));
+	
+	/*
+	if(BackGroundImage)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Image 형식으로 캐스팅 성공!"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Image 형식으로 캐스팅 실패.."));
+	}*/
 }

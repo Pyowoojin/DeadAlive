@@ -4,30 +4,47 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Interfaces/PickupInterface.h"
 #include "InventoryBar.generated.h"
 
 class ABaseWeapon;
 class UWeaponSlot;
 class UTextBlock;
-/**
- * 
- */
+
+USTRUCT(Atomic)
+struct FArrayStruct
+{
+	GENERATED_BODY()
+	
+	UPROPERTY(VisibleAnywhere)
+	UWeaponSlot* WeaponSlot = nullptr;
+	UPROPERTY(VisibleAnywhere)
+	ABaseWeapon* Weapon = nullptr;
+};
+
 UCLASS()
-class DEADALIVE_API UInventoryBar : public UUserWidget
+class DEADALIVE_API UInventoryBar : public UUserWidget, public IPickupInterface
 {
 	GENERATED_BODY()
 public :
 	UInventoryBar(const FObjectInitializer &ObjectInitializer);
 	void InsertWeapon(ABaseWeapon* Weapon);
 	void InitSlot(const UInventoryBar* InventoryBar);
-	void RefreshSlot();
+	void RefreshSlot(int32 num);
+	void SetPointerLocation(const int32 Location);
+	FORCEINLINE int32 GetPointerLocation() const { return Pointer; }
+	virtual void IPickUpItem(ABaseWeapon* Weapon) override;
 
 private :
-	int32 Pointer = 0;
+	UPROPERTY(VisibleAnywhere, Category = "Custom", meta = (AllowPrivateAccess = "true"))
+	int32 Pointer = 1;
 	int32 MaxSlotSize = 6;
 	
 	UPROPERTY(VisibleAnywhere, Category = "Custom", meta = (AllowPrivateAccess = "true"))
 	TArray<UWeaponSlot*> SlotArray;
+
+	UPROPERTY(VisibleAnywhere, Category = "Custom", meta = (AllowPrivateAccess = "true"))
+	TArray<FArrayStruct> WeaponArray;
 
 	UPROPERTY(VisibleAnywhere, Category = "Custom", meta = (AllowPrivateAccess = "true"))
 	TArray<UTextBlock*> TextSlotArray;
