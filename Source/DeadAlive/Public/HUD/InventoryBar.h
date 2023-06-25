@@ -32,6 +32,7 @@ public :
 	void InitSlot(const UInventoryBar* InventoryBar);
 	void ClearSlot();
 	void SetPointerLocation(int32 Location);
+	bool IsWeaponInThisSlot();
 	FORCEINLINE int32 GetPointerLocation() const { return Pointer; }
 	virtual void IPickUpItem(ABaseWeapon* Weapon) override;
 

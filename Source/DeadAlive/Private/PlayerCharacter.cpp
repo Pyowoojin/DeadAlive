@@ -239,17 +239,35 @@ void APlayerCharacter::EKeyPressed()
 	// 손에 들고 있는 무기가 있다면, 무기를 내려놓음
 	else if(CharAttribute && CharAttribute->GetEquippedWeapon())
 	{
-		CharAttribute->GetEquippedWeapon()->ItemDivestiture();
+		/*CharAttribute->GetEquippedWeapon()->ItemDivestiture();
 		CharAttribute->GetEquippedWeapon()->ThrowTheWeapon();
 		CharAttribute->SetEquippedWeapon(nullptr);
-		InventoryBar->ClearSlot();
+		InventoryBar->ClearSlot();*/
+		PutDownWeapon();
 
-		// 플레이어 HUD 위젯 갱신
+		/*// 플레이어 HUD 위젯 갱신
 		if(WeaponHUDWidget)
 		{
 			WeaponHUDWidget->SetWeaponAmmoCount(0);
 			WeaponHUDWidget->SetCurrentAmmoNameText(" ");
-		}
+		}*/
+	}
+}
+
+void APlayerCharacter::PutDownWeapon()
+{
+	if(!InventoryBar->IsWeaponInThisSlot()) return;
+
+	CharAttribute->GetEquippedWeapon()->ItemDivestiture();
+	CharAttribute->GetEquippedWeapon()->ThrowTheWeapon();
+	CharAttribute->SetEquippedWeapon(nullptr);
+	InventoryBar->ClearSlot();
+
+	// 플레이어 HUD 위젯 갱신
+	if(WeaponHUDWidget)
+	{
+		WeaponHUDWidget->SetWeaponAmmoCount(0);
+		WeaponHUDWidget->SetCurrentAmmoNameText(" ");
 	}
 }
 

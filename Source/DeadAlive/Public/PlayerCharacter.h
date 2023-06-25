@@ -115,8 +115,8 @@ private:
 	UFUNCTION()
 	void AutoFireReset();
 	void SpawnDefaultWeapon();
-
 	void ShootingModeChange();
+	void PutDownWeapon();
 
 	// 재장전 함수
 	void ReloadButtonPressed();

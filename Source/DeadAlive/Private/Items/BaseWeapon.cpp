@@ -91,6 +91,11 @@ void ABaseWeapon::SetCollisionWhenItemDivestiture()
 // 다른 무기로 변경할 때
 void ABaseWeapon::SetCollisionWhenItemChange()
 {
+	// 물리, OverlapSphere들 다 끄고
+	SetCollisionWhenItemDivestiture();
+
+	// 추가로 매쉬까지 없애주면 됨
+	Skm->SetVisibility(false);
 	
 }
 

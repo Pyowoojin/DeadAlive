@@ -56,16 +56,20 @@ void UInventoryBar::InitSlot(const UInventoryBar* InventoryBar)
 		if(WeaponArray[i].WeaponSlot != nullptr)
 		{
 			WeaponArray[i].WeaponSlot->Init();
+			WeaponArray[i].Weapon = nullptr;
 			SlotCheck[i] = true;
 		}
 	}
 }
 
+// 해당 슬롯을 비워준다.
 void UInventoryBar::ClearSlot()
 {
 	WeaponArray[Pointer-1].WeaponSlot->Init();
+	WeaponArray[Pointer-1].Weapon = nullptr;
 }
 
+// 플레이어의 입력에 따라 (1,2,3...) 무기 슬롯을 가리키는 포인터의 위치를 지정해준다.
 void UInventoryBar::SetPointerLocation(int32 Location)
 {
 	TextSlotArray[Pointer-1]->SetColorAndOpacity(FLinearColor::White);
@@ -73,6 +77,14 @@ void UInventoryBar::SetPointerLocation(int32 Location)
 	
 	TextSlotArray[Pointer-1]->SetColorAndOpacity(FLinearColor::Red);
 	UE_LOG(LogTemp, Warning, TEXT(" 포인터의 위치는 = %d"), Pointer);
+}
+
+// 해당 포인터 슬롯에 무기가 있다면 True, 없다면 False 반환
+bool UInventoryBar::IsWeaponInThisSlot()
+{
+	if(WeaponArray[Pointer-1].Weapon == nullptr)
+		return false;
+	return true;
 }
 
 void UInventoryBar::IPickUpItem(ABaseWeapon* Item)
