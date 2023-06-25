@@ -20,6 +20,8 @@ class USoundWave;
 class UWeaponSlot;
 class UInventoryBar;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FEquipItemDelegate, int32, CurrentSlotIndex, int32, NewSlotIndex);
+
 UENUM(BlueprintType)
 enum class ECombatState : uint8
 {
@@ -244,6 +246,10 @@ private:
 	bool bFiringBullet = false;
 	FTimerHandle CrosshairShootTimer;
 	FTimerHandle AutoFireTimer;
+
+	// 무기를 습득할 때 인벤토리 바로 슬롯 정보를 보내기 위한 델리게이트
+	UPROPERTY(BlueprintAssignable, Category = Delegates, meta = (AllowPrivateAccess = "true"))
+	FEquipItemDelegate EquipItemDelegate;
 
 	// HUD에 대한 레퍼런스
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SLATE_CULL_WIDGETS, meta = (AllowPrivateAccess = "true"))

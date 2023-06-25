@@ -24,6 +24,7 @@ public :
 
 	void Init();
 	void RefreshSlot(class ABaseWeapon* Weapon);
+	void ClearSlot();
 	
 private :
 	UPROPERTY(VisibleAnywhere, Category = Custom, meta = (AllowPrivateAccess = "true"))

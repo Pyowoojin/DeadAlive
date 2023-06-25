@@ -30,15 +30,15 @@ public :
 	UInventoryBar(const FObjectInitializer &ObjectInitializer);
 	void InsertWeapon(ABaseWeapon* Weapon);
 	void InitSlot(const UInventoryBar* InventoryBar);
-	void RefreshSlot(int32 num);
-	void SetPointerLocation(const int32 Location);
+	void ClearSlot();
+	void SetPointerLocation(int32 Location);
 	FORCEINLINE int32 GetPointerLocation() const { return Pointer; }
 	virtual void IPickUpItem(ABaseWeapon* Weapon) override;
 
 private :
 	UPROPERTY(VisibleAnywhere, Category = "Custom", meta = (AllowPrivateAccess = "true"))
 	int32 Pointer = 1;
-	int32 MaxSlotSize = 6;
+	int32 MaxSlotSize = 5;
 	
 	UPROPERTY(VisibleAnywhere, Category = "Custom", meta = (AllowPrivateAccess = "true"))
 	TArray<UWeaponSlot*> SlotArray;

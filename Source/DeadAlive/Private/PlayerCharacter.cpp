@@ -215,20 +215,17 @@ void APlayerCharacter::EKeyPressed()
 	
 	if(CharAttribute && CharAttribute->GetOverlappedItem())
 	{
-		//ABaseWeapon* Weapon = Cast<ABaseWeapon>(CharAttribute->GetOverlappedItem());
 		ABaseItem* Item = Cast<ABaseItem>(CharAttribute->GetOverlappedItem());
-		// 무기일 경우 InventoryBar의 WeaponArray에 넣어줄거임
-		if(Item->IsA(ABaseWeapon::StaticClass()))
+
+		// 무기일 경우, 해당 슬롯에 무기를 들고있지 않을 경우 InventoryBar의 WeaponArray에 넣어줄거임
+		if(Item->IsA(ABaseWeapon::StaticClass()) && CharAttribute->GetEquippedWeapon() == nullptr)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("무기 맞음"));
 			ABaseWeapon* PassingWeapon = Cast<ABaseWeapon>(Item);
 			InventoryBar->InsertWeapon(PassingWeapon);
 		}
+		
 		Item->PickUpItem(this);
 		RefreshAllTypeOfAmmoWidget();
-
-
-		
 		
 		// 무기의 이름과 그 무기가 가진 총알 개수를 갱신한다.
 		if(WeaponHUDWidget && CharAttribute->GetEquippedWeapon() != nullptr)
@@ -245,6 +242,7 @@ void APlayerCharacter::EKeyPressed()
 		CharAttribute->GetEquippedWeapon()->ItemDivestiture();
 		CharAttribute->GetEquippedWeapon()->ThrowTheWeapon();
 		CharAttribute->SetEquippedWeapon(nullptr);
+		InventoryBar->ClearSlot();
 
 		// 플레이어 HUD 위젯 갱신
 		if(WeaponHUDWidget)

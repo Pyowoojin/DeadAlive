@@ -19,9 +19,8 @@ UInventoryBar::UInventoryBar(const FObjectInitializer &ObjectInitializer) : Supe
 
 void UInventoryBar::InsertWeapon(ABaseWeapon* Weapon)
 {
-	WeaponArray[Pointer].Weapon = Weapon;
-	WeaponArray[Pointer].WeaponSlot->RefreshSlot(Weapon);
-	RefreshSlot(Pointer);
+	WeaponArray[Pointer-1].Weapon = Weapon;
+	WeaponArray[Pointer-1].WeaponSlot->RefreshSlot(Weapon);
 	UE_LOG(LogTemp, Warning, TEXT("%s"), *Weapon->GetWeaponAttributes()->GetItemName());
 }
 
@@ -62,21 +61,22 @@ void UInventoryBar::InitSlot(const UInventoryBar* InventoryBar)
 	}
 }
 
-void UInventoryBar::SetPointerLocation(const int32 Location)
+void UInventoryBar::ClearSlot()
+{
+	WeaponArray[Pointer-1].WeaponSlot->Init();
+}
+
+void UInventoryBar::SetPointerLocation(int32 Location)
 {
 	TextSlotArray[Pointer-1]->SetColorAndOpacity(FLinearColor::White);
-	Pointer = FMath::Clamp(Location, 0, MaxSlotSize-1);
+	Pointer = FMath::Clamp(Location, 0, MaxSlotSize);
 	
 	TextSlotArray[Pointer-1]->SetColorAndOpacity(FLinearColor::Red);
+	UE_LOG(LogTemp, Warning, TEXT(" 포인터의 위치는 = %d"), Pointer);
 }
 
 void UInventoryBar::IPickUpItem(ABaseWeapon* Item)
 {
 	IPickupInterface::IPickUpItem(Item);
 	UE_LOG(LogTemp, Warning, TEXT("InventoryBar 진입!"));
-}
-
-void UInventoryBar::RefreshSlot(int32 num)
-{
-	
 }

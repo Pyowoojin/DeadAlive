@@ -3,6 +3,7 @@
 
 #include "HUD/WeaponSlot.h"
 
+#include "Attributes/WeaponAttributes.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
@@ -37,6 +38,21 @@ void UWeaponSlot::RefreshSlot(ABaseWeapon* Weapon)
 	BackGroundImage->SetBrush(Brush);
 	BackGroundImage->SetVisibility(ESlateVisibility::Visible);
 
+	Brush.SetResourceObject(Weapon->GetWeaponIcon());
+	WeaponIcon->SetBrush(Brush);
+	WeaponIcon->SetVisibility(ESlateVisibility::Visible);
+
+	Brush.SetResourceObject(Weapon->GetAmmoImage());
+	AmmoIcon->SetBrush(Brush);
+	AmmoIcon->SetVisibility(ESlateVisibility::Visible);
+
+
+	const int32 WeaponAmmo = Weapon->GetWeaponAttributes()->GetAmmoCount();
+	const FText TextAmount = FText::FromString(FString::Printf(TEXT("%d"), WeaponAmmo));
+	WeaponAmmoCount->SetText(TextAmount);
+
+	
+
 	UE_LOG(LogTemp, Warning, TEXT("Refresh"));
 	
 	/*
@@ -48,4 +64,9 @@ void UWeaponSlot::RefreshSlot(ABaseWeapon* Weapon)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Image 형식으로 캐스팅 실패.."));
 	}*/
+}
+
+void UWeaponSlot::ClearSlot()
+{
+	
 }
