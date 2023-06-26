@@ -504,7 +504,6 @@ void APlayerCharacter::ShotKeyPressed(const FInputActionValue& Value)
 			if(GEngine && ScreenTraceHit.GetActor() != nullptr)
 			{
 				GEngine->AddOnScreenDebugMessage(29, 2.f, FColor::Turquoise, ScreenTraceHit.GetActor()->GetName());
-				UE_LOG(LogTemp, Warning, TEXT("TASD!@#!"));
 			}
 			
 			// 크로스헤어에서 위치에서 라인 트레이스 발사
@@ -668,28 +667,89 @@ void APlayerCharacter::CameraAiming(float DeltaTime)
 
 void APlayerCharacter::NumKey1Pressed()
 {
+	ChangeWeaponByNumKey(1);
 	InventoryBar->SetPointerLocation(1);
 }
 
 void APlayerCharacter::NumKey2Pressed()
 {
+	ChangeWeaponByNumKey(2);
 	InventoryBar->SetPointerLocation(2);
 }
 
 void APlayerCharacter::NumKey3Pressed()
 {
+	ChangeWeaponByNumKey(3);
 	InventoryBar->SetPointerLocation(3);
 	
 }
 
 void APlayerCharacter::NumKey4Pressed()
 {
+	ChangeWeaponByNumKey(4);
 	InventoryBar->SetPointerLocation(4);
 }
 
 void APlayerCharacter::NumKey5Pressed()
 {
+	ChangeWeaponByNumKey(5);
 	InventoryBar->SetPointerLocation(5);
+}
+
+
+void APlayerCharacter::ChangeWeaponByNumKey(const int32 Num)
+{
+	// 현재 슬롯의 무기는 Visiblility->False로 바꾸고
+	// 다음 슬롯의 무기는 Visibility->True
+	// 하지만, 다음 슬롯에 무기가 없다면? -> 
+	
+	const int32 CurPointerLocation = InventoryBar->GetPointerLocation();
+	
+	// 그냥 같은 슬롯을 선택했을 경우에는 무시한다.
+	if(CurPointerLocation == Num) return;
+
+	// 1. 현재 슬롯에 무기가 있고 && 다음 슬롯에도 무기가 있을 때 (1,1)
+	// 2. 현재 슬롯에 무기가 있고 && 다음 슬롯에 무기가 없을 때 (1,0)
+	// 3. 현재 슬롯에 무기가 없고 && 다음 슬롯에 무기가 있을 때 (0,1)
+	// 4. 현재 슬롯에 무기가 없을 때 && 다음 슬롯에도 무기가 없을 때 (0,0) 
+
+	// 둘 다 무기가 있을 경우 -> 현재 무기 Invisible, 다음 무기 Visible
+	if(InventoryBar->IsWeaponInThisSlot() && InventoryBar->IsWeaponInThisSlot(Num))
+	{
+		// 현재 무기의 기능을 꺼주고
+		CharAttribute->GetEquippedWeapon()->SetCollisionWhenItemChangeOFF();
+		// N번 슬롯의 무기를 장착해준다.
+		CharAttribute->SetEquippedWeapon(InventoryBar->GetWeaponInSlot(Num));
+		// 해당 무기의 기능을 켜준다.
+		CharAttribute->GetEquippedWeapon()->SetCollisionWhenItemChangeON();
+		UE_LOG(LogTemp,Warning, TEXT("1, 1 실행"));
+	}
+
+	// 현재에만 무기가 있을 경우
+	else if(InventoryBar->IsWeaponInThisSlot() && !InventoryBar->IsWeaponInThisSlot(Num))
+	{
+		// 현재 무기의 기능을 꺼주고
+		CharAttribute->GetEquippedWeapon()->SetCollisionWhenItemChangeOFF();
+		// 장착 무기를 NULL로 바꿔준다.
+		CharAttribute->SetEquippedWeapon(nullptr);
+		UE_LOG(LogTemp,Warning, TEXT("1, 0 실행"));
+	}
+
+	// 다음 슬롯에만 무기가 있을 경우
+	else if(!InventoryBar->IsWeaponInThisSlot() && InventoryBar->IsWeaponInThisSlot(Num)){
+		UE_LOG(LogTemp,Warning, TEXT("0, 1 실행"));
+		// 무기를 장착해주고
+		CharAttribute->SetEquippedWeapon(InventoryBar->GetWeaponInSlot(Num));
+		// Visibility ON
+		CharAttribute->GetEquippedWeapon()->SetCollisionWhenItemChangeON();
+	}
+	// 둘 다 무기가 없을 경우
+	else
+	{
+		UE_LOG(LogTemp,Warning, TEXT("0, 0 실행"));
+		return ;
+	}
+	
 }
 
 
@@ -709,10 +769,10 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	Input->BindAction(InputShotChange, ETriggerEvent::Started, this, &APlayerCharacter::ShootingModeChange);
 	Input->BindAction(InputAim, ETriggerEvent::Started, this, &APlayerCharacter::AimKeyPressed);
 	Input->BindAction(InputAim, ETriggerEvent::Canceled, this, &APlayerCharacter::AimKeyPressed);
-	Input->BindAction(NumKey1,  ETriggerEvent::Triggered, this, &APlayerCharacter::NumKey1Pressed);
-	Input->BindAction(NumKey2,  ETriggerEvent::Triggered, this, &APlayerCharacter::NumKey2Pressed);
-	Input->BindAction(NumKey3,  ETriggerEvent::Triggered, this, &APlayerCharacter::NumKey3Pressed);
-	Input->BindAction(NumKey4,  ETriggerEvent::Triggered, this, &APlayerCharacter::NumKey4Pressed);
-	Input->BindAction(NumKey5,  ETriggerEvent::Triggered, this, &APlayerCharacter::NumKey5Pressed);
+	Input->BindAction(NumKey1,  ETriggerEvent::Started, this, &APlayerCharacter::NumKey1Pressed);
+	Input->BindAction(NumKey2,  ETriggerEvent::Started, this, &APlayerCharacter::NumKey2Pressed);
+	Input->BindAction(NumKey3,  ETriggerEvent::Started, this, &APlayerCharacter::NumKey3Pressed);
+	Input->BindAction(NumKey4,  ETriggerEvent::Started, this, &APlayerCharacter::NumKey4Pressed);
+	Input->BindAction(NumKey5,  ETriggerEvent::Started, this, &APlayerCharacter::NumKey5Pressed);
 	
 }

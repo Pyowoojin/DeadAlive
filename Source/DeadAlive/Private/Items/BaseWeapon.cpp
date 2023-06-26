@@ -25,9 +25,6 @@ ABaseWeapon::ABaseWeapon()
 	
 	FirePoint = CreateDefaultSubobject<USceneComponent>(TEXT("FirePoint"));
 	FirePoint->SetupAttachment(GetRootComponent());
-	
-	
-	
 	WeaponAttributes = CreateDefaultSubobject<UWeaponAttributes>(TEXT("WeaponAttributes"));
 	
 	SetCollisionWhenItemDivestiture();
@@ -44,33 +41,54 @@ void ABaseWeapon::BeginPlay()
 	DisableCustomDepth();
 }
 
+// 아이템을 버림
 void ABaseWeapon::ItemDivestiture()
 {
 	SetCollisionWhenItemDivestiture();
 	const FDetachmentTransformRules DetachmentTransformRules(EDetachmentRule::KeepWorld, false);
 	this->DetachFromActor(DetachmentTransformRules);
-	SetItemState(EItemState::EIS_Free);
 
 	// 형광 효과 다시 활성화
 	// EnableCustomDepth();
 }
 
-// 아이템을 플레이어가 주울 때, 콜리전과 시뮬레이트 비활성화, 소켓에 붙임, 아이템 상태 변경
+// 아이템을 플레이어가 주울 때, 콜리전과 시뮬레이트 비활성화, 소켓에 붙임, 아이템 상태 변경 ★ NewWeapon ★
 void ABaseWeapon::ItemAcquisition(USceneComponent* InParent, AActor* NewOwner)
 {
+
+	// 바닥에서 습득한 무기라면 캐릭터 소켓에 부착해야함
+	if(this->Owner == nullptr)
+	{
+		// 캐릭터 무기 소켓에 부착하기
+		const FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
+		this->AttachToComponent(InParent, AttachmentRules, FName("RightHandWeaponSocket"));
+	}
+	
 	// 아이템 피직스와 콜라이더 설정 변경
 	this->Owner = NewOwner;
+	SetCollisionWhenItemChangeOFF();
+	/*Skm->SetSimulatePhysics(false);
+	Skm->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	SphereCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	NoticeSphereCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);*/
+
+	Skm->SetVisibility(true);
+	SetItemState(EItemState::EIS_Equipped);
+}
+
+// 변경될 무기 (Old Weapon) : 슬롯에 들어갈 무기를 말함 ★ Old Weapon ★
+void ABaseWeapon::SetCollisionWhenItemChangeOFF()
+{
+	// 물리 효과, OverlapSphere들 전부 끄고
 	Skm->SetSimulatePhysics(false);
 	Skm->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	Skm->SetVisibility(false);
 	SphereCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	NoticeSphereCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-	// 캐릭터 무기 소켓에 부착하기
-	const FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
-	this->AttachToComponent(InParent, AttachmentRules, FName("RightHandWeaponSocket"));
-
 	// 아이템 상태 변경하기 Free -> Equipped
-	SetItemState(EItemState::EIS_Equipped);
+	SetItemState(EItemState::EIS_UnEquipped);
+	
 }
 
 // 아이템을 다시 떨어트릴 때 -> 콜리전, 시뮬레이션을 모아놓은 함수
@@ -85,22 +103,23 @@ void ABaseWeapon::SetCollisionWhenItemDivestiture()
 		SphereCollision->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
 		SphereCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 		NoticeSphereCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		SetItemState(EItemState::EIS_Free);
 	}
 }
 
-// 다른 무기로 변경할 때
-void ABaseWeapon::SetCollisionWhenItemChange()
+// 변경된 무기 (New Weapon) : 이제 바꾸는 무기를 말함
+void ABaseWeapon::SetCollisionWhenItemChangeON()
 {
-	// 물리, OverlapSphere들 다 끄고
-	SetCollisionWhenItemDivestiture();
+	// 물리, OverlapSphere들 다 켜고
+	//SetCollisionWhenItemDivestiture();
 
-	// 추가로 매쉬까지 없애주면 됨
-	Skm->SetVisibility(false);
+	// 매쉬까지 다시 보이게 하기
+	Skm->SetVisibility(true);
 	
 }
 
 void ABaseWeapon::NoticeRangeBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+                                          UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	Super::NoticeRangeBeginOverlap(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
 	// 이게 맞는지 잘 모르겠음... 부모 변수 그대로 끌어다 쓰는건데 이게 맞음?

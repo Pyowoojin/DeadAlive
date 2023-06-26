@@ -37,7 +37,8 @@ public :
 	void ItemAcquisition(USceneComponent* InParent, AActor* NewOwner);
 	void ItemDivestiture();
 	void SetCollisionWhenItemDivestiture();
-	void SetCollisionWhenItemChange();
+	void SetCollisionWhenItemChangeON();
+	void SetCollisionWhenItemChangeOFF();
 	FORCEINLINE FName GetClipBoneName() const { return ClipBoneName; }
 	FORCEINLINE void SetMovingClip(bool Move) { bMovingClip = Move; }
 

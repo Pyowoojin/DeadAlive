@@ -76,7 +76,7 @@ void UInventoryBar::SetPointerLocation(int32 Location)
 	Pointer = FMath::Clamp(Location, 0, MaxSlotSize);
 	
 	TextSlotArray[Pointer-1]->SetColorAndOpacity(FLinearColor::Red);
-	UE_LOG(LogTemp, Warning, TEXT(" 포인터의 위치는 = %d"), Pointer);
+	// UE_LOG(LogTemp, Warning, TEXT(" 포인터의 위치는 = %d"), Pointer);
 }
 
 // 해당 포인터 슬롯에 무기가 있다면 True, 없다면 False 반환
@@ -85,6 +85,23 @@ bool UInventoryBar::IsWeaponInThisSlot()
 	if(WeaponArray[Pointer-1].Weapon == nullptr)
 		return false;
 	return true;
+}
+
+// 무기 확인 오버로딩 함수
+bool UInventoryBar::IsWeaponInThisSlot(const int Num)
+{
+	if(WeaponArray[Num-1].Weapon == nullptr)
+		return false;
+	return true;
+}
+
+// 해당 Pointer 슬롯에 있는 무기 가져오기 
+ABaseWeapon* UInventoryBar::GetWeaponInSlot(int Num)
+{
+	if(WeaponArray[Num-1].Weapon != nullptr)
+		return WeaponArray[Num-1].Weapon;
+	else
+		return nullptr;
 }
 
 void UInventoryBar::IPickUpItem(ABaseWeapon* Item)

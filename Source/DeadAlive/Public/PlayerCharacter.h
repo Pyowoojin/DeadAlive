@@ -117,6 +117,7 @@ private:
 	void SpawnDefaultWeapon();
 	void ShootingModeChange();
 	void PutDownWeapon();
+	void ChangeWeaponByNumKey(const int32 Num);
 
 	// 재장전 함수
 	void ReloadButtonPressed();
