@@ -239,31 +239,12 @@ void APlayerCharacter::EKeyPressed()
 	// 손에 들고 있는 무기가 있다면, 무기를 내려놓음
 	else if(CharAttribute && CharAttribute->GetEquippedWeapon())
 	{
-		/*CharAttribute->GetEquippedWeapon()->ItemDivestiture();
-		CharAttribute->GetEquippedWeapon()->ThrowTheWeapon();
-		CharAttribute->SetEquippedWeapon(nullptr);
-		InventoryBar->ClearSlot();*/
 		PutDownWeapon();
-
-		/*// 플레이어 HUD 위젯 갱신
-		if(WeaponHUDWidget)
-		{
-			WeaponHUDWidget->SetWeaponAmmoCount(0);
-			WeaponHUDWidget->SetCurrentAmmoNameText(" ");
-		}*/
 	}
 }
 
-void APlayerCharacter::PutDownWeapon()
+void APlayerCharacter::InitPlayerWeaponHUD()
 {
-	if(!InventoryBar->IsWeaponInThisSlot()) return;
-
-	CharAttribute->GetEquippedWeapon()->ItemDivestiture();
-	CharAttribute->GetEquippedWeapon()->ThrowTheWeapon();
-	CharAttribute->SetEquippedWeapon(nullptr);
-	InventoryBar->ClearSlot();
-
-	// 플레이어 HUD 위젯 갱신
 	if(WeaponHUDWidget)
 	{
 		WeaponHUDWidget->SetWeaponAmmoCount(0);
@@ -271,11 +252,26 @@ void APlayerCharacter::PutDownWeapon()
 	}
 }
 
+void APlayerCharacter::PutDownWeapon()
+{
+	// 무기가 이 해당에 없다면 종료
+	if(!InventoryBar->IsWeaponInThisSlot()) return;
+
+	// 무기의 Collision과 Simulation을 켜주고 바닥에 버린다.
+	CharAttribute->GetEquippedWeapon()->ItemDivestiture();
+	CharAttribute->GetEquippedWeapon()->ThrowTheWeapon();
+	CharAttribute->SetEquippedWeapon(nullptr);
+	InventoryBar->ClearSlot();
+
+	// 플레이어 HUD 위젯 갱신
+	InitPlayerWeaponHUD();
+}
+
 void APlayerCharacter::RunKeyPressed(const FInputActionValue& Value)
 {
 	if(Value.Get<bool>() == true)
 	{
-		GetCharacterMovement()->MaxWalkSpeed = 1000;
+		GetCharacterMovement()->MaxWalkSpeed = 950;
 	}
 	else
 	{
@@ -509,7 +505,7 @@ void APlayerCharacter::ShotKeyPressed(const FInputActionValue& Value)
 			// 크로스헤어에서 위치에서 라인 트레이스 발사
 			GetWorld()->LineTraceSingleByChannel(ScreenTraceHit, FireStartPoint, FireEndPoint, ECC_Visibility);
 			// 총 발사 함수 호출
-			CharAttribute->GetEquippedWeapon()->GunFire(ScreenTraceHit);
+			CharAttribute->GetEquippedWeapon()->GunFire(ScreenTraceHit, this);
 			
 			
 			RefreshTheCurrentAmmoWidget();
@@ -667,18 +663,24 @@ void APlayerCharacter::CameraAiming(float DeltaTime)
 
 void APlayerCharacter::NumKey1Pressed()
 {
+	if(CombatState != ECombatState::ECS_Unoccupied) return ;
+	
 	ChangeWeaponByNumKey(1);
 	InventoryBar->SetPointerLocation(1);
 }
 
 void APlayerCharacter::NumKey2Pressed()
 {
+	if(CombatState != ECombatState::ECS_Unoccupied) return ;
+	
 	ChangeWeaponByNumKey(2);
 	InventoryBar->SetPointerLocation(2);
 }
 
 void APlayerCharacter::NumKey3Pressed()
 {
+	if(CombatState != ECombatState::ECS_Unoccupied) return ;
+	
 	ChangeWeaponByNumKey(3);
 	InventoryBar->SetPointerLocation(3);
 	
@@ -686,12 +688,16 @@ void APlayerCharacter::NumKey3Pressed()
 
 void APlayerCharacter::NumKey4Pressed()
 {
+	if(CombatState != ECombatState::ECS_Unoccupied) return ;
+	
 	ChangeWeaponByNumKey(4);
 	InventoryBar->SetPointerLocation(4);
 }
 
 void APlayerCharacter::NumKey5Pressed()
 {
+	if(CombatState != ECombatState::ECS_Unoccupied) return ;
+	
 	ChangeWeaponByNumKey(5);
 	InventoryBar->SetPointerLocation(5);
 }
@@ -699,10 +705,6 @@ void APlayerCharacter::NumKey5Pressed()
 
 void APlayerCharacter::ChangeWeaponByNumKey(const int32 Num)
 {
-	// 현재 슬롯의 무기는 Visiblility->False로 바꾸고
-	// 다음 슬롯의 무기는 Visibility->True
-	// 하지만, 다음 슬롯에 무기가 없다면? -> 
-	
 	const int32 CurPointerLocation = InventoryBar->GetPointerLocation();
 	
 	// 그냥 같은 슬롯을 선택했을 경우에는 무시한다.
@@ -749,7 +751,11 @@ void APlayerCharacter::ChangeWeaponByNumKey(const int32 Num)
 		UE_LOG(LogTemp,Warning, TEXT("0, 0 실행"));
 		return ;
 	}
-	
+	if(CharAttribute->GetEquippedWeapon())
+	{
+		CharAttribute->GetEquippedWeapon()->PlayWeaponPickupSound();
+		RefreshTheCurrentAmmoWidget();
+	}
 }
 
 

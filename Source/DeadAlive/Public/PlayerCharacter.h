@@ -72,6 +72,7 @@ protected:
 	void Look(const FInputActionValue& Value);
 	void RefreshAllTypeOfAmmoWidget();
 	void EKeyPressed();
+	void InitPlayerWeaponHUD();
 	void RunKeyPressed(const FInputActionValue& Value);
 	void AimKeyPressed(const FInputActionValue& Value);
 	void ShotKeyPressed(const FInputActionValue& Value);

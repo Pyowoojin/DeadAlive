@@ -11,6 +11,8 @@
 #include "Attributes/WeaponAttributes.h"
 #include "PlayerCharacter.h"
 #include "Components/Image.h"
+#include "Enemy/EnemyCharacter.h"
+#include "Engine/DamageEvents.h"
 #include "HUD/WeaponInfoWidget.h"
 
 void ABaseWeapon::IPickUpItem(ABaseWeapon* Weapon)
@@ -172,7 +174,7 @@ void ABaseWeapon::FireEffectPlay(const FHitResult& HitResult)
 }
 
 // Play FireSound and FireFlash 
-void ABaseWeapon::GunFire(const FHitResult &HitResult)
+void ABaseWeapon::GunFire(const FHitResult &HitResult, AActor* Player)
 {
 	// 총구 위치 구하기
 	FirePointVector = FirePoint->GetComponentLocation();
@@ -186,6 +188,21 @@ void ABaseWeapon::GunFire(const FHitResult &HitResult)
 	if(WeaponHitResult.bBlockingHit)
 	{
 		FireEndPoint = WeaponHitResult.Location;
+	}
+
+	// HitResult? WeaponHitResult? 뭘 써야 하지?
+	// HitResult
+
+	if(HitResult.GetActor()->ActorHasTag(FName("Enemy")))
+	{
+		if(AEnemyCharacter* Enemy = Cast<AEnemyCharacter>(HitResult.GetActor()))
+		{
+			const FDamageEvent DamageEvent;
+			// UGameplayStatics::ApplyDamage(Enemy, GetWeaponDamage(), Player->GetInstigatorController(), Player, nullptr);
+			Enemy->GetHit(HitResult.ImpactPoint, Player, WeaponDamage);
+			// Enemy->TakeDamage(GetWeaponDamage(), DamageEvent, Player->GetInstigatorController(), Player);
+			UE_LOG(LogTemp, Warning, TEXT("데미지 함수 실행"));
+		}
 	}
 	
 	// 총 소리 플레이, 총구 화염, 총탄과 비행운 생성

@@ -29,7 +29,7 @@ public :
 	void PlayFireSound();
 	void PlayFireMuzzleEffect();
 	void FireEffectPlay(const FHitResult& HitResult);
-	void GunFire(const FHitResult &HitResult);
+	void GunFire(const FHitResult &HitResult, AActor* Player);
 	void DecreaseBulletCount();
 	FORCEINLINE UWeaponAttributes* GetWeaponAttributes() const { return WeaponAttributes; }
 	FORCEINLINE FName GetReloadMontageSection() const { return ReloadMontageSection; }
@@ -41,6 +41,7 @@ public :
 	void SetCollisionWhenItemChangeOFF();
 	FORCEINLINE FName GetClipBoneName() const { return ClipBoneName; }
 	FORCEINLINE void SetMovingClip(bool Move) { bMovingClip = Move; }
+	FORCEINLINE int32 GetWeaponDamage() const { return WeaponDamage; }
 
 	// Slot HUD를 위한 함수
 
@@ -86,8 +87,8 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess ="true"))
 	bool bMovingClip = false;
 
-	/*UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UWeaponSlot* WeaponSlot;*/
+	UPROPERTY(VisibleAnywhere)
+	int32 WeaponDamage = 15;
 
 	// WeaponSlot을 위한 변수들
 

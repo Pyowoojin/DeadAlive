@@ -105,6 +105,7 @@ public :
 	
 
 	void ThrowTheWeapon();
+	void PlayWeaponPickupSound();
 
 	virtual void PickUpItem(APlayerCharacter* Player);
 

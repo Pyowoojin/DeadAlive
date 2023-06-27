@@ -160,10 +160,15 @@ void ABaseItem::ThrowTheWeapon()
 	Skm->AddImpulse(ThrowDirection*1500.f);
 }
 
+void ABaseItem::PlayWeaponPickupSound()
+{
+	UGameplayStatics::PlaySoundAtLocation(this, EquipSound, this->GetActorLocation(), this->GetActorRotation());
+}
+
 // 오버라이드해서 사용할거임
 void ABaseItem::PickUpItem(APlayerCharacter* Player)
 {
-	UGameplayStatics::PlaySoundAtLocation(this, EquipSound, this->GetActorLocation(), this->GetActorRotation());
+	PlayWeaponPickupSound();
 }
 
 void ABaseItem::OnSphereOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
