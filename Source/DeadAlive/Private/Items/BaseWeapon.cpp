@@ -193,7 +193,7 @@ void ABaseWeapon::GunFire(const FHitResult &HitResult, AActor* Player)
 	// HitResult? WeaponHitResult? 뭘 써야 하지?
 	// HitResult
 
-	if(HitResult.GetActor()->ActorHasTag(FName("Enemy")))
+	if(HitResult.bBlockingHit && HitResult.GetActor()->ActorHasTag(FName("Enemy")))
 	{
 		if(AEnemyCharacter* Enemy = Cast<AEnemyCharacter>(HitResult.GetActor()))
 		{
@@ -201,8 +201,9 @@ void ABaseWeapon::GunFire(const FHitResult &HitResult, AActor* Player)
 			// UGameplayStatics::ApplyDamage(Enemy, GetWeaponDamage(), Player->GetInstigatorController(), Player, nullptr);
 			Enemy->GetHit(HitResult.ImpactPoint, Player, WeaponDamage);
 			// Enemy->TakeDamage(GetWeaponDamage(), DamageEvent, Player->GetInstigatorController(), Player);
-			UE_LOG(LogTemp, Warning, TEXT("데미지 함수 실행"));
+			
 		}
+		UE_LOG(LogTemp, Warning, TEXT("마지막 실행 구간3"));
 	}
 	
 	// 총 소리 플레이, 총구 화염, 총탄과 비행운 생성

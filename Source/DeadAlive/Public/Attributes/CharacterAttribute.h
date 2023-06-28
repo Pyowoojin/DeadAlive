@@ -16,10 +16,14 @@ class DEADALIVE_API UCharacterAttribute : public UActorComponent
 public:	
 	UCharacterAttribute();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	// 아이템에 관한 함수들
 	void SetOverlapItem(ABaseItem* Item);
 	FORCEINLINE void SetEquippedWeapon(ABaseWeapon* Item) { EquippedWeapon = Item; }
 	FORCEINLINE ABaseWeapon* GetEquippedWeapon() const { return EquippedWeapon;}
 	ABaseItem* GetOverlappedItem();
+
+	// 총알에 관한 함수들 Start
 	// 모든 총알 개수 리턴
 	FORCEINLINE int32 GetAllOfAmmoCount() const { return Ammo556 + Ammo762; }
 	FORCEINLINE void SetAmmoCount(int32 AmmoCount) { Ammo556 += AmmoCount;}
@@ -37,11 +41,11 @@ protected:
 private :
 	/* 캐릭터 스탯? */
 	UPROPERTY(EditAnywhere, Category = "Character Attributes")
-	float Health;
+	float Health = 100.f;
 	UPROPERTY(EditAnywhere, Category = "Character Attributes")
-	float MaxHealth;
+	float MaxHealth = 100.f;
 	UPROPERTY(EditAnywhere, Category = "Character Attributes")
-	float Stamina;
+	float Stamina = 100.f;
 
 	UPROPERTY(VisibleAnywhere)
 	ABaseItem* OverlappedItem;

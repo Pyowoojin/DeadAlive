@@ -33,8 +33,8 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-	private :
-		float GunDamage = 5.f;
+private :
+	float GunDamage = 5.f;
 	UPROPERTY(VisibleAnywhere, Category = "Weapon Atrributes", meta = (AllowPrivateAccess = "true"))
 	int32 RemainedBulletCount = 30;
 	int32 MaxBulletCount = 30;

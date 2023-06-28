@@ -396,10 +396,13 @@ void APlayerCharacter::ReloadWeapon()
 	// 무언가를 하고 있는 중 일때, 무기가 없을때, 총알이 없을때 바로 return
 	if(CombatState != ECombatState::ECS_Unoccupied || CharAttribute->GetEquippedWeapon() == nullptr || !CharAttribute->HasAmmo(CharAttribute->GetEquippedWeapon()->GetWeaponAttributes()->GetWeaponType())) return;
 	// 현재 갖고 있는 총알이 최대 개수일 때 바로 return
+
+	// § 여기 부분 수정
 	if(CharAttribute->GetEquippedWeapon()->GetWeaponAttributes()->IsFullAmmo()) return;
 	
 	CombatState = ECombatState::ECS_Reloading;
 	// 총알을 채우기 위해 현재 장착 중인 총알의 타입을 구함
+	// § 여기 부분 수정
 	const auto AmmoType = CharAttribute->GetEquippedWeapon()->GetWeaponAttributes()->GetWeaponType();
 
 	// 총을 꽉 채우는데 필요한 총알의 개수를 구함
@@ -504,10 +507,10 @@ void APlayerCharacter::ShotKeyPressed(const FInputActionValue& Value)
 			
 			// 크로스헤어에서 위치에서 라인 트레이스 발사
 			GetWorld()->LineTraceSingleByChannel(ScreenTraceHit, FireStartPoint, FireEndPoint, ECC_Visibility);
+			DrawDebugLine(GetWorld(), FireStartPoint, FireEndPoint, FColor::Orange, false, 3.f);
+			
 			// 총 발사 함수 호출
 			CharAttribute->GetEquippedWeapon()->GunFire(ScreenTraceHit, this);
-			
-			
 			RefreshTheCurrentAmmoWidget();
 
 			// 크로스헤어를 위한 총 발사 타이머 실행
