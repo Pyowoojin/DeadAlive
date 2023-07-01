@@ -69,10 +69,6 @@ void ABaseWeapon::ItemAcquisition(USceneComponent* InParent, AActor* NewOwner)
 	// 아이템 피직스와 콜라이더 설정 변경
 	this->Owner = NewOwner;
 	SetCollisionWhenItemChangeOFF();
-	/*Skm->SetSimulatePhysics(false);
-	Skm->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	SphereCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	NoticeSphereCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);*/
 
 	Skm->SetVisibility(true);
 	SetItemState(EItemState::EIS_Equipped);
@@ -157,22 +153,6 @@ void ABaseWeapon::PlayFireMuzzleEffect()
 	}
 }
 
-void ABaseWeapon::FireEffectPlay(const FHitResult& HitResult)
-{
-	if(ShootParticle && HitResult.bBlockingHit)
-	{
-		UGameplayStatics::SpawnEmitterAtLocation(this, ShootParticle, FireEndPoint);
-	}
-	if(BeamParticle && HitResult.bBlockingHit)
-	{
-		UParticleSystemComponent* Beam = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BeamParticle, FirePointVector);
-		if(Beam)
-		{
-			Beam->SetVectorParameter(FName("Target"), FireEndPoint);
-		}
-	}
-}
-
 // Play FireSound and FireFlash 
 void ABaseWeapon::GunFire(const FHitResult &HitResult, AActor* Player)
 {
@@ -190,20 +170,14 @@ void ABaseWeapon::GunFire(const FHitResult &HitResult, AActor* Player)
 		FireEndPoint = WeaponHitResult.Location;
 	}
 
-	// HitResult? WeaponHitResult? 뭘 써야 하지?
-	// HitResult
-
+	// 피격 대상이 적이면 파티클 생성
 	if(HitResult.bBlockingHit && HitResult.GetActor()->ActorHasTag(FName("Enemy")))
 	{
 		if(AEnemyCharacter* Enemy = Cast<AEnemyCharacter>(HitResult.GetActor()))
 		{
 			const FDamageEvent DamageEvent;
-			// UGameplayStatics::ApplyDamage(Enemy, GetWeaponDamage(), Player->GetInstigatorController(), Player, nullptr);
 			Enemy->GetHit(HitResult.ImpactPoint, Player, WeaponDamage);
-			// Enemy->TakeDamage(GetWeaponDamage(), DamageEvent, Player->GetInstigatorController(), Player);
-			
 		}
-		UE_LOG(LogTemp, Warning, TEXT("마지막 실행 구간3"));
 	}
 	
 	// 총 소리 플레이, 총구 화염, 총탄과 비행운 생성
@@ -214,6 +188,42 @@ void ABaseWeapon::GunFire(const FHitResult &HitResult, AActor* Player)
 	// 총알 개수 감소
 	DecreaseBulletCount();
 	
+}
+
+void ABaseWeapon::FireEffectPlay(const FHitResult& HitResult)
+{
+	if(HitResult.GetActor())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("%s"), *HitResult.GetActor()->GetName());
+	}
+	// 적이 아닌 물체에 총알이 부딪혔을 때만 Particle 생성.
+	if(ShootParticle && HitResult.bBlockingHit)
+	{
+		if(HitResult.GetActor() && HitResult.GetActor()->ActorHasTag(TEXT("Enemy")))
+		{
+			// DrawDebugSphere(GetWorld(), HitResult.Location, 15.f, 16, FColor::Red, false, 5.f);
+		}
+		else
+		{
+			UGameplayStatics::SpawnEmitterAtLocation(this, ShootParticle, FireEndPoint);
+			/*const FString ActorName = HitResult.GetActor()->GetName();
+			UE_LOG(LogTemp, Error, TEXT("%s"), *ActorName);*/
+			// DrawDebugSphere(GetWorld(), HitResult.Location, 15.f, 16, FColor::Blue, false, 5.f);
+		}
+	}
+	else if(!HitResult.bBlockingHit)
+	{
+		UE_LOG(LogTemp, Error, TEXT("저는 부딪힌 적이 없습니다."));
+	}
+	
+	if(BeamParticle && HitResult.bBlockingHit)
+	{
+		UParticleSystemComponent* Beam = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BeamParticle, FirePointVector);
+		if(Beam)
+		{
+			Beam->SetVectorParameter(FName("Target"), FireEndPoint);
+		}
+	}
 }
 
 void ABaseWeapon::DecreaseBulletCount()

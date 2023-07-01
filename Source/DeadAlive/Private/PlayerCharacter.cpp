@@ -507,7 +507,8 @@ void APlayerCharacter::ShotKeyPressed(const FInputActionValue& Value)
 			
 			// 크로스헤어에서 위치에서 라인 트레이스 발사
 			GetWorld()->LineTraceSingleByChannel(ScreenTraceHit, FireStartPoint, FireEndPoint, ECC_Visibility);
-			DrawDebugLine(GetWorld(), FireStartPoint, FireEndPoint, FColor::Orange, false, 3.f);
+			const FVector HitPoint = ScreenTraceHit.ImpactPoint;
+			//DrawDebugLine(GetWorld(), FireStartPoint, HitPoint, FColor::Orange, false, 3.f);
 			
 			// 총 발사 함수 호출
 			CharAttribute->GetEquippedWeapon()->GunFire(ScreenTraceHit, this);
