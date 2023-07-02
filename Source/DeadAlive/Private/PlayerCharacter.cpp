@@ -271,7 +271,7 @@ void APlayerCharacter::RunKeyPressed(const FInputActionValue& Value)
 {
 	if(Value.Get<bool>() == true)
 	{
-		GetCharacterMovement()->MaxWalkSpeed = 950;
+		GetCharacterMovement()->MaxWalkSpeed = 820;
 	}
 	else
 	{

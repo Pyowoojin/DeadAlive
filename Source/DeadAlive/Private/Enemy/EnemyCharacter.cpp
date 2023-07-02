@@ -47,7 +47,6 @@ void AEnemyCharacter::PlayAnimation(UAnimMontage* AnimMontage)
 {
 	if(UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
 	{
-		UE_LOG(LogTemp, Error, TEXT("지;ㄴ짜 재생ㅋㅋzzz"));
 		AnimInstance->Montage_Play(AnimMontage);
 		AnimInstance->Montage_JumpToSection(FName("Dying3"));
 	}
@@ -68,6 +67,11 @@ void AEnemyCharacter::GetHit(const FVector& ImpactPoint, AActor* Hitter, const f
 {
 	const FDamageEvent DamageEvent;
 
+	if(HitSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSound, GetActorLocation(), GetActorRotation(), 0.35f);
+	}
+
 	if(BloodParticle)
 	{
 		// 랜덤 X, Y, Z 회전을 구하여 파티클로 생성해줄 것임.
@@ -78,8 +82,6 @@ void AEnemyCharacter::GetHit(const FVector& ImpactPoint, AActor* Hitter, const f
 	Health -= TakeDamage(TakenDamage, DamageEvent, Hitter->GetInstigatorController(), Hitter);
 	if(Health <= 0.f && !IsDead)
 	{
-		// 애니메이션 재생 후 DeadState 변환
-		// UE_LOG(LogTemp, Warning, TEXT("애니메이션 재생"));
 		PlayAnimation(DeathAnimMontage);
 		IsDead = true;
 		StopMovement();

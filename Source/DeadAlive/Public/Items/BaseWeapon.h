@@ -28,6 +28,7 @@ public :
 	virtual void BeginPlay() override;
 	void PlayFireSound();
 	void PlayFireMuzzleEffect();
+	void HitAndEffects(const FHitResult& HitResult, AActor* Player);
 	void FireEffectPlay(const FHitResult& HitResult);
 	void GunFire(const FHitResult &HitResult, AActor* Player);
 	void DecreaseBulletCount();

@@ -57,7 +57,6 @@ void ABaseWeapon::ItemDivestiture()
 // 아이템을 플레이어가 주울 때, 콜리전과 시뮬레이트 비활성화, 소켓에 붙임, 아이템 상태 변경 ★ NewWeapon ★
 void ABaseWeapon::ItemAcquisition(USceneComponent* InParent, AActor* NewOwner)
 {
-
 	// 바닥에서 습득한 무기라면 캐릭터 소켓에 부착해야함
 	if(this->Owner == nullptr)
 	{
@@ -153,26 +152,13 @@ void ABaseWeapon::PlayFireMuzzleEffect()
 	}
 }
 
-// Play FireSound and FireFlash 
-void ABaseWeapon::GunFire(const FHitResult &HitResult, AActor* Player)
+void ABaseWeapon::HitAndEffects(const FHitResult& HitResult, AActor* Player)
 {
-	// 총구 위치 구하기
-	FirePointVector = FirePoint->GetComponentLocation();
-
-	// 총구와 사격 지점 사이에 물체가 있는지 확인하는 LineTrace
-	FHitResult WeaponHitResult;
-	FireStartPoint = FirePointVector;
-	FireEndPoint = HitResult.Location;
-	GetWorld()->LineTraceSingleByChannel(WeaponHitResult, FireStartPoint, FireEndPoint, ECC_Visibility);
-	// 총구와 사격 지점사이에 물체가 있다면, TargetPoint를 바꿔주고 그렇지 않다면 원래 위치에 사격 효과를 준다.
-	if(WeaponHitResult.bBlockingHit)
-	{
-		FireEndPoint = WeaponHitResult.Location;
-	}
-
-	// 피격 대상이 적이면 파티클 생성
+	// 피격 대상이 적이면 데미지를 입힌다.
 	if(HitResult.bBlockingHit && HitResult.GetActor()->ActorHasTag(FName("Enemy")))
 	{
+		UE_LOG(LogTemp, Warning, TEXT("%s"), *HitResult.GetActor()->GetName());
+		
 		if(AEnemyCharacter* Enemy = Cast<AEnemyCharacter>(HitResult.GetActor()))
 		{
 			const FDamageEvent DamageEvent;
@@ -184,6 +170,37 @@ void ABaseWeapon::GunFire(const FHitResult &HitResult, AActor* Player)
 	PlayFireSound();
 	PlayFireMuzzleEffect();
 	FireEffectPlay(HitResult);
+}
+
+// Play FireSound and FireFlash 
+void ABaseWeapon::GunFire(const FHitResult &HitResult, AActor* Player)
+{
+	// 총구 위치 구하기
+	FirePointVector = FirePoint->GetComponentLocation();
+
+	// 총구와 사격 지점 사이에 물체가 있는지 확인하는 LineTrace
+	FHitResult WeaponHitResult;
+	FireStartPoint = FirePointVector;
+	FireEndPoint = HitResult.Location;
+
+	// 총구 위치 - 사격 End Point 사이에 물체가 있으면 WeaponHitResult에 찍히게 될 것임.
+	// 크로스헤어에서 발사한 LineTrace와 총구에서 발사한 LineTrace의 ImpactPoint가 같지 않다면, 최종 LineTrace의 도착 위치를 총구에서 발사한 ImpactPoint로 바꿔주어야함!
+	GetWorld()->LineTraceSingleByChannel(WeaponHitResult, FireStartPoint, FireEndPoint, ECC_Visibility);
+	// 총구와 사격 지점사이에 물체가 있다면, TargetPoint를 바꿔주고 그렇지 않다면 원래 위치에 사격 효과를 준다.
+
+	// 둘 사이에 물체가 없다면 기존 HitResult를 넘기고, 물체가 있다면 WeaponHitResult를 넘김 
+	if(WeaponHitResult.bBlockingHit && WeaponHitResult.ImpactPoint != HitResult.ImpactPoint)
+	{
+		FireEndPoint = WeaponHitResult.ImpactPoint;
+		HitAndEffects(WeaponHitResult, Player);
+		UE_LOG(LogTemp, Error, TEXT("물체가 있음. 그 물체의 이름은 : %s"), *WeaponHitResult.GetActor()->GetName());
+	}
+	else
+	{
+		HitAndEffects(HitResult, Player);
+	}
+
+	DrawDebugLine(GetWorld(), FireStartPoint, FireEndPoint, FColor::Orange, false, 2.5f);
 
 	// 총알 개수 감소
 	DecreaseBulletCount();
@@ -192,10 +209,11 @@ void ABaseWeapon::GunFire(const FHitResult &HitResult, AActor* Player)
 
 void ABaseWeapon::FireEffectPlay(const FHitResult& HitResult)
 {
-	if(HitResult.GetActor())
+	/*if(HitResult.GetActor())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("%s"), *HitResult.GetActor()->GetName());
-	}
+	}*/
+	
 	// 적이 아닌 물체에 총알이 부딪혔을 때만 Particle 생성.
 	if(ShootParticle && HitResult.bBlockingHit)
 	{
