@@ -13,7 +13,7 @@
 #include "HUD/PlayerWeaponHUDWidget.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "HUD/InventoryBar.h"
-#include "Items/Ammunition.h"
+#include "Items/Obstacles.h"
 #include "Kismet/GameplayStatics.h"
 
 /*
@@ -22,6 +22,14 @@ if(GEngine)
 	GEngine->AddOnScreenDebugMessage(171, -1.f, FColor::Black, TEXT("hello"));
 }
 */
+
+void APlayerCharacter::DebugTextLog(FString NewText) const
+{
+	if(GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(1772, 3.f, FColor::Purple, *NewText);
+	}
+}
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -55,6 +63,16 @@ APlayerCharacter::APlayerCharacter()
 
 	// 핸드 씬 컴포넌트 생성
 	HandSceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("HandSceneComponent"));
+
+	// 오브젝트 설치 컴포넌트 생성
+	ObjectPlaceSceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("ObjectSceneComponent"));
+
+
+	// TransParent Object 생성
+	if(TransparentObstacles)
+	{
+		
+	}
 }
 
 void APlayerCharacter::IncrementOverlappedItemCount(int8 Amount)
@@ -609,10 +627,10 @@ bool APlayerCharacter::TraceUnderCrosshairs(FHitResult& HitResult)
 		const FVector Start = CrossHairWorldPosition;
 		const FVector End = Start + CrossHairWorldDirection * 50000.f;
 		GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility);
-		if(GEngine)
+		/*if(GEngine)
 		{
 			GEngine->AddOnScreenDebugMessage(12321, 1.f, FColor::Cyan, TEXT("VIEWIEWE"));
-		}
+		}*/
 		if(HitResult.bBlockingHit)
 			return true;
 	}
@@ -640,15 +658,6 @@ void APlayerCharacter::OverlappingItem(ABaseItem* Item)
 		CharAttribute->SetOverlapItem(Item);
 	}
 }
-
-// 삭제해
-/*void APlayerCharacter::OverlappingItem_Implementation(ABaseItem* Item)
-{
-	if(CharAttribute)
-	{
-		CharAttribute->SetOverlapItem(Item);
-	}
-}*/
 
 // 줌 인 - 아웃시 카메라 부드럽게 하기
 void APlayerCharacter::CameraAiming(float DeltaTime)
@@ -762,6 +771,116 @@ void APlayerCharacter::ChangeWeaponByNumKey(const int32 Num)
 	}
 }
 
+void APlayerCharacter::DrawLineOfObstacles()
+{
+	// 오브젝트 설치키가 꺼졌다면 함수 종료
+	if(!IsHandled)
+	{
+		GetWorldTimerManager().ClearTimer(DrawObstacleLineTimer);
+		return;
+	}
+	
+	if(SpawnedObstacle)
+	{
+		// 스크린 위치에서 목표물의 위치를 구할 것임.
+		if(GetScreenCenterToConvertWorld())
+		{
+			// 카메라의 정면 벡터를 구함. 위 아래 회전 없이 정면만!
+			const FVector CamForwardVector = FVector(MainCam->GetForwardVector().X, MainCam->GetForwardVector().Y, 0.f);
+			// 정면으로부터 + PlaceMaxRange -> 오브젝트 생성 위치 (높이 제외하고) 
+			const FVector StartVector = CrossHairWorldPosition + CamForwardVector * PlaceMaxRange;
+			// 그 위치부터 Z축으로 무지성으로 내림. 처음 닿게 되는 물체에 오브젝트를 생성할 것임.
+			const FVector EndVector = StartVector - FVector(0.f, 0.f, 500.f);
+			FHitResult Result;
+			// 상술한 위치 기반으로 LineTrace를 쏜다.
+			GetWorld()->LineTraceSingleByChannel(Result, StartVector, EndVector,ECC_Visibility);
+
+			// 바닥에 닿지 않았다면 생성 X
+			if(Result.bBlockingHit)
+			{
+				ObjectPlaceSceneComponent->SetWorldLocation(Result.ImpactPoint);
+				
+				DrawDebugLine(GetWorld(), CrossHairWorldPosition, StartVector, FColor::Black, false, 3.f);
+				DrawDebugLine(GetWorld(), StartVector, Result.ImpactPoint, FColor::Black, false, 3.f);
+				DrawDebugSphere(GetWorld(), Result.ImpactPoint, 32.f, 32, FColor::Blue, false, 3.f);
+			}
+		}
+	}
+}
+
+void APlayerCharacter::PlaceObject()
+{
+	IsHandled = !IsHandled;
+	UE_LOG(LogTemp, Error, TEXT("징닙"));
+	if(IsHandled)
+	{
+		// 생성된 투명 물체가 없다면 생성할거임ㅋ
+		if(SpawnedObstacle == nullptr)
+		{
+			// 반투명한 오브젝트 생성 후 생성 위치 컴포넌트에 붙이기
+			UE_LOG(LogTemp, Error, TEXT("생성했음"));
+			SpawnedObstacle = GetWorld()->SpawnActor<AObstacles>(TransparentObstacles, ObjectPlaceSceneComponent->GetComponentLocation(), GetActorRotation());
+			FAttachmentTransformRules AttachmentRules(EAttachmentRule::KeepRelative, true);
+			SpawnedObstacle->AttachToComponent(ObjectPlaceSceneComponent, AttachmentRules);
+			SpawnedObstacle->SetActorLocation(ObjectPlaceSceneComponent->GetComponentLocation());
+		}
+		
+		GetWorldTimerManager().SetTimer(DrawObstacleLineTimer, this, &APlayerCharacter::DrawLineOfObstacles, 0.3f, true);
+	}
+	else{
+		
+	}
+
+
+
+
+
+
+
+
+
+
+
+	
+	/*
+	// 처음 눌렀을 때에는 물체가 배치될 위치만 보여주고, 두 번째 눌렀을 때에 물체를 배치해보자!
+	if(IsHandled)
+	{
+		DrawLineOfObstacles();
+		IsHandled = !IsHandled;
+		const FVector TargetLoc = GetActorLocation() + FVector(300.f, 0.f , 0.f);
+
+		if(TransparentObstacles)
+		{
+			if(GetScreenCenterToConvertWorld())
+			{
+				FHitResult Result;
+				// 물체를 설치할 위치 LineTrace -> 최종적으로는 닿지 않더라도 그냥 Z축으로 쭉 내려야할듯함.
+				GetWorld()->LineTraceSingleByChannel(Result, CrossHairWorldPosition, CrossHairWorldPosition + CrossHairWorldDirection * 5000, ECC_Visibility);
+				if(Result.bBlockingHit)
+				{
+					// 카메라 <-> 바닥 사이의 라인을 그림
+					DrawDebugLine(GetWorld(), CrossHairWorldPosition, Result.ImpactPoint, FColor::White, false, 3.f);
+					const FActorSpawnParameters SpawnParams;
+					ObjectPlaceSceneComponent->SetRelativeLocation(Result.ImpactPoint);
+					//GetWorld()->SpawnActor<AObstacles>(Obstacles, Result.ImpactPoint, GetActorRotation(), SpawnParams);
+					GetWorld()->SpawnActor<AObstacles>(Obstacles, ObjectPlaceSceneComponent->GetComponentLocation(), GetActorRotation(), SpawnParams);
+				}
+			}
+		}
+		else
+		{
+			FString MyString = TEXT("hello Unreal");
+			DebugTextLog(TEXT("Hello"));
+		}
+	}
+	else
+	{
+		IsHandled = !IsHandled;
+		DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + FVector(300.f, 0.f , 50.f), FColor::Red, false, 5.f);
+	}*/
+}
+
 
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -784,5 +903,5 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	Input->BindAction(NumKey3,  ETriggerEvent::Started, this, &APlayerCharacter::NumKey3Pressed);
 	Input->BindAction(NumKey4,  ETriggerEvent::Started, this, &APlayerCharacter::NumKey4Pressed);
 	Input->BindAction(NumKey5,  ETriggerEvent::Started, this, &APlayerCharacter::NumKey5Pressed);
-	
+	Input->BindAction(PlaceObstacle,  ETriggerEvent::Started, this, &APlayerCharacter::PlaceObject);
 }

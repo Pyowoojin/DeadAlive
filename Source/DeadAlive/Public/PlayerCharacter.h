@@ -7,6 +7,7 @@
 #include "Interfaces/PickupInterface.h"
 #include "PlayerCharacter.generated.h"
 
+class AObstacles;
 class USpringArmComponent;
 class UCameraComponent;
 class UInputMappingContext;
@@ -37,6 +38,9 @@ class DEADALIVE_API APlayerCharacter : public ACharacter, public IPickupInterfac
 	GENERATED_BODY()
 
 public:
+
+	void DebugTextLog(FString NewText) const;
+	
 	APlayerCharacter();
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -119,6 +123,7 @@ private:
 	void ShootingModeChange();
 	void PutDownWeapon();
 	void ChangeWeaponByNumKey(const int32 Num);
+	void PlaceObject();
 
 	// 재장전 함수
 	void ReloadButtonPressed();
@@ -136,6 +141,9 @@ private:
 	void ReleaseClip();
 
 	// 탄창 애니메이션을 위한 함수 END
+
+	// 장애물 관련 함수
+	void DrawLineOfObstacles();
 
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	float LimitedSpeed;
@@ -172,6 +180,8 @@ private:
 	UInputAction* NumKey4;
 	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputAction* NumKey5;
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* PlaceObstacle;
 
 	
 	UPROPERTY(EditAnywhere, Category = "Input")
@@ -246,6 +256,7 @@ private:
 	
 	float ShootTimeDuration = 0.05f;
 	bool bFiringBullet = false;
+
 	FTimerHandle CrosshairShootTimer;
 	FTimerHandle AutoFireTimer;
 
@@ -266,4 +277,23 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SLATE_CULL_WIDGETS, meta = (AllowPrivateAccess = "true"))
 	UInventoryBar* InventoryBar;
+
+	// 물체 추적 관련 변수 & 함수들 모음
+	FTimerHandle DrawObstacleLineTimer;
+	bool IsHandled = false;
+	float PlaceMaxRange = 700.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Custom", meta = (AllowPrivateAccess = "true"))
+	UClass* Obstacles;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Custom", meta = (AllowPrivateAccess = "true"))
+	UClass* TransparentObstacles;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Custom", meta = (AllowPrivateAccess = "true"))
+	AObstacles* SpawnedObstacle;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	USceneComponent* ObjectPlaceSceneComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	FVector PlaceObjectVector;
 };
