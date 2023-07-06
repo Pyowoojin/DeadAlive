@@ -123,7 +123,6 @@ private:
 	void ShootingModeChange();
 	void PutDownWeapon();
 	void ChangeWeaponByNumKey(const int32 Num);
-	void PlaceObject();
 
 	// 재장전 함수
 	void ReloadButtonPressed();
@@ -141,9 +140,6 @@ private:
 	void ReleaseClip();
 
 	// 탄창 애니메이션을 위한 함수 END
-
-	// 장애물 관련 함수
-	void DrawLineOfObstacles();
 
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	float LimitedSpeed;
@@ -296,4 +292,8 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	FVector PlaceObjectVector;
+
+	// 장애물 관련 함수
+	void DrawLineOfObstacles();
+	void PlaceObject();
 };

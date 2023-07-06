@@ -776,6 +776,7 @@ void APlayerCharacter::DrawLineOfObstacles()
 	// 오브젝트 설치키가 꺼졌다면 함수 종료
 	if(!IsHandled)
 	{
+		SpawnedObstacle->SetHidden(true);
 		GetWorldTimerManager().ClearTimer(DrawObstacleLineTimer);
 		return;
 	}
@@ -799,10 +800,6 @@ void APlayerCharacter::DrawLineOfObstacles()
 			if(Result.bBlockingHit)
 			{
 				ObjectPlaceSceneComponent->SetWorldLocation(Result.ImpactPoint);
-				
-				DrawDebugLine(GetWorld(), CrossHairWorldPosition, StartVector, FColor::Black, false, 3.f);
-				DrawDebugLine(GetWorld(), StartVector, Result.ImpactPoint, FColor::Black, false, 3.f);
-				DrawDebugSphere(GetWorld(), Result.ImpactPoint, 32.f, 32, FColor::Blue, false, 3.f);
 			}
 		}
 	}
@@ -811,9 +808,9 @@ void APlayerCharacter::DrawLineOfObstacles()
 void APlayerCharacter::PlaceObject()
 {
 	IsHandled = !IsHandled;
-	UE_LOG(LogTemp, Error, TEXT("징닙"));
 	if(IsHandled)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("핸들핸들"));
 		// 생성된 투명 물체가 없다면 생성할거임ㅋ
 		if(SpawnedObstacle == nullptr)
 		{
@@ -824,20 +821,19 @@ void APlayerCharacter::PlaceObject()
 			SpawnedObstacle->AttachToComponent(ObjectPlaceSceneComponent, AttachmentRules);
 			SpawnedObstacle->SetActorLocation(ObjectPlaceSceneComponent->GetComponentLocation());
 		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("엘스핸들"));
+			SpawnedObstacle->SetHidden(false);
+		}
 		
-		GetWorldTimerManager().SetTimer(DrawObstacleLineTimer, this, &APlayerCharacter::DrawLineOfObstacles, 0.3f, true);
+		GetWorldTimerManager().SetTimer(DrawObstacleLineTimer, this, &APlayerCharacter::DrawLineOfObstacles, 0.05f, true);
 	}
 	else{
-		
+		SpawnedObstacle->SetHidden(true);
+		UE_LOG(LogTemp, Warning, TEXT("설치완ㄹ뇨"));
+		GetWorld()->SpawnActor<AObstacles>(Obstacles, ObjectPlaceSceneComponent->GetComponentLocation(), GetActorRotation());
 	}
-
-
-
-
-
-
-
-
 
 
 

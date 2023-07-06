@@ -5,6 +5,7 @@
 #include "Interfaces/HitInterface.h"
 #include "EnemyCharacter.generated.h"
 
+class AAIController;
 class UParticleSystem;
 class USoundBase;
 class UNiagaraSystem;
@@ -31,6 +32,8 @@ public:
 	virtual void GetHit(const FVector& ImpactPoint, AActor* Hitter, const float TakenDamage) override;
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	FRotator ReturnRandomRotation() const;
+	void MoveToPoint(AActor* GoalActor);
+	void EnemyInitialize();
 
 	void PlayAnimation(UAnimMontage* AnimMontage);
 	void StopMovement() const;
@@ -51,7 +54,6 @@ private :
 	bool IsDead = false;
 
 	FTimerHandle DestroyTimer;
-	
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Custom, meta = (AllowPrivateAccess = "true"))
 	UParticleSystem* HitParticle;
@@ -66,5 +68,14 @@ private :
 
 	UPROPERTY(EditAnywhere, Category = Custom, meta = (AllowPrivateAccess = "true"))
 	UAnimMontage* DeathAnimMontage;
+
+	UPROPERTY(VisibleAnywhere, Category = Custom, meta = (AllowPrivateAccess = "true"))
+	AAIController* AIController;
+
+	/*UPROPERTY(EditAnywhere, Category = Custom, meta = (AllowPrivateAccess = "true"))
+	TArray<AActor*> TargetPoint;*/
+	
+	UPROPERTY(EditAnywhere, Category = Custom, meta = (AllowPrivateAccess = "true"))
+	AActor* TargetPoint;
 
 };

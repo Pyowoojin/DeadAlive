@@ -1,5 +1,5 @@
 #include "Enemy/EnemyCharacter.h"
-
+#include "AIController.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Engine/SkeletalMesh.h"
 #include "Engine/DamageEvents.h"
@@ -15,6 +15,8 @@ AEnemyCharacter::AEnemyCharacter()
 void AEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	EnemyInitialize();
+	MoveToPoint(TargetPoint);
 	
 }
 void AEnemyCharacter::Tick(float DeltaTime)
@@ -41,6 +43,22 @@ FRotator AEnemyCharacter::ReturnRandomRotation() const
 	const int32 TempY = FMath::RandRange(1, 359);
 	const int32 TempZ = FMath::RandRange(1, 359);
 	return FRotator(TempX, TempY, TempZ);
+}
+
+void AEnemyCharacter::MoveToPoint(AActor* GoalActor)
+{
+	if(AIController)
+	{
+		FAIMoveRequest MoveRequest;
+		MoveRequest.SetGoalActor(GoalActor);
+		AIController->MoveTo(MoveRequest);
+	}
+}
+
+void AEnemyCharacter::EnemyInitialize()
+{
+	AIController = Cast<AAIController>(GetController());
+	
 }
 
 void AEnemyCharacter::PlayAnimation(UAnimMontage* AnimMontage)

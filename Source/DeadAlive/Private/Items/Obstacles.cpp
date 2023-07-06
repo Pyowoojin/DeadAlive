@@ -6,7 +6,7 @@ AObstacles::AObstacles()
 	PrimaryActorTick.bCanEverTick = true;
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Object"));
 	SetRootComponent(StaticMesh);
-	StaticMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	// StaticMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	
 }
 void AObstacles::BeginPlay()
