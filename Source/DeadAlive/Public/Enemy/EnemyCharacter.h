@@ -3,8 +3,10 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Interfaces/HitInterface.h"
+#include "Navigation/PathFollowingComponent.h"
 #include "EnemyCharacter.generated.h"
 
+class UPawnSensingComponent;
 class AAIController;
 class UParticleSystem;
 class USoundBase;
@@ -50,8 +52,8 @@ private :
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float MaxHealth = 100;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	bool IsDead = false;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	bool bIsDead = false;
 
 	FTimerHandle DestroyTimer;
 
@@ -69,6 +71,9 @@ private :
 	UPROPERTY(EditAnywhere, Category = Custom, meta = (AllowPrivateAccess = "true"))
 	UAnimMontage* DeathAnimMontage;
 
+	UPROPERTY(EditAnywhere, Category = Custom, meta = (AllowPrivateAccess = "true"))
+	UAnimMontage* HitAnimMontage;
+
 	UPROPERTY(VisibleAnywhere, Category = Custom, meta = (AllowPrivateAccess = "true"))
 	AAIController* AIController;
 
@@ -77,5 +82,21 @@ private :
 	
 	UPROPERTY(EditAnywhere, Category = Custom, meta = (AllowPrivateAccess = "true"))
 	AActor* TargetPoint;
+
+	// AI 관련
+	UPROPERTY(VisibleAnywhere)
+	UPawnSensingComponent* PawnSensingComponent;
+
+	UFUNCTION()
+	void PlayerDetected(APawn* TargetActor);
+
+	UFUNCTION()
+	void ChangeTarget(APawn* TargetActor);
+
+	UPROPERTY(VisibleAnywhere, Category = Custom, meta = (AllowPrivateAccess = "true"))
+	float AcceptanceRadiusMax = 100.f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Custom, meta = (AllowPrivateAccess = "true"))
+	EEnemyState EnemyState = EEnemyState::EES_Idle;
 
 };
