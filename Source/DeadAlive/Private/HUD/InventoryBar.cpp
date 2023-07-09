@@ -28,7 +28,7 @@ void UInventoryBar::InitSlot(const UInventoryBar* InventoryBar)
 {
 	// overlay 슬롯들 매핑시켜주기
 	
-	DefaultWeaponSlott = Cast<UWeaponSlot>(InventoryBar->GetWidgetFromName(TEXT("DefaultWeaponSlot")));
+	// DefaultWeaponSlott = Cast<UWeaponSlot>(InventoryBar->GetWidgetFromName(TEXT("DefaultWeaponSlot")));
 	WeaponSlot01 = Cast<UWeaponSlot>(InventoryBar->GetWidgetFromName(TEXT("WeaponSlot1")));
 	WeaponSlot02 = Cast<UWeaponSlot>(InventoryBar->GetWidgetFromName(TEXT("WeaponSlot2")));
 	WeaponSlot03 = Cast<UWeaponSlot>(InventoryBar->GetWidgetFromName(TEXT("WeaponSlot3")));
@@ -76,7 +76,6 @@ void UInventoryBar::SetPointerLocation(int32 Location)
 	Pointer = FMath::Clamp(Location, 0, MaxSlotSize);
 	
 	TextSlotArray[Pointer-1]->SetColorAndOpacity(FLinearColor::Red);
-	// UE_LOG(LogTemp, Warning, TEXT(" 포인터의 위치는 = %d"), Pointer);
 }
 
 // 해당 포인터 슬롯에 무기가 있다면 True, 없다면 False 반환
@@ -100,12 +99,10 @@ ABaseWeapon* UInventoryBar::GetWeaponInSlot(int Num)
 {
 	if(WeaponArray[Num-1].Weapon != nullptr)
 		return WeaponArray[Num-1].Weapon;
-	else
-		return nullptr;
+	return nullptr;
 }
 
 void UInventoryBar::IPickUpItem(ABaseWeapon* Item)
 {
 	IPickupInterface::IPickUpItem(Item);
-	UE_LOG(LogTemp, Warning, TEXT("InventoryBar 진입!"));
 }

@@ -31,8 +31,6 @@ void UWeaponSlot::Init()
 
 void UWeaponSlot::RefreshSlot(ABaseWeapon* Weapon)
 {
-	// BackGroundImage->Brush = Weapon->GetWeaponIcon();
-
 	FSlateBrush Brush;
 	Brush.SetResourceObject(Weapon->GetBackgroundImage());
 	BackGroundImage->SetBrush(Brush);
@@ -50,20 +48,6 @@ void UWeaponSlot::RefreshSlot(ABaseWeapon* Weapon)
 	const int32 WeaponAmmo = Weapon->GetWeaponAttributes()->GetAmmoCount();
 	const FText TextAmount = FText::FromString(FString::Printf(TEXT("%d"), WeaponAmmo));
 	WeaponAmmoCount->SetText(TextAmount);
-
-	
-
-	UE_LOG(LogTemp, Warning, TEXT("Refresh"));
-	
-	/*
-	if(BackGroundImage)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Image 형식으로 캐스팅 성공!"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Image 형식으로 캐스팅 실패.."));
-	}*/
 }
 
 void UWeaponSlot::ClearSlot()

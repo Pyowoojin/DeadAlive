@@ -19,8 +19,11 @@ enum class EEnemyState : uint8
 	EES_Idle UMETA(DisplayName = "Idle"),
 	EES_Combat UMETA(DisplayName = "Combat"),
 	EES_Chasing UMETA(DisplayName = "Chasing"),
+	EES_Patrol UMETA(DisplayName = "Patrol"),
 	EES_Dead UMETA(DisplayName = "Dead"),
 };
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDynamicMultiDele);
 
 UCLASS()
 class DEADALIVE_API AEnemyCharacter : public ACharacter, public IHitInterface
@@ -36,11 +39,21 @@ public:
 	FRotator ReturnRandomRotation() const;
 	void MoveToPoint(AActor* GoalActor);
 	void EnemyInitialize();
+	void CreateNewPatrolJob();
+
+	UFUNCTION()
+	void DeleTest(FAIRequestID RequestID, EPathFollowingResult::Type Result);
 
 	void PlayAnimation(UAnimMontage* AnimMontage);
 	void StopMovement() const;
 	bool GetIsDead() const;
 	FORCEINLINE void TempFunc() { Destroy(); }
+
+	void DelayTimerFunction(const float DelayTimer);
+	
+	UPROPERTY(BlueprintAssignable, VisibleAnywhere, BlueprintCallable, Category = "Custom")
+	FDynamicMultiDele Fuc_DeleMulti;
+	FTimerHandle PatrolTimer;
 	
 
 protected:
@@ -68,6 +81,9 @@ private :
 
 	// 애니메이션 관련
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	int32 HitCount = 0;
+	
 	UPROPERTY(EditAnywhere, Category = Custom, meta = (AllowPrivateAccess = "true"))
 	UAnimMontage* DeathAnimMontage;
 
@@ -76,9 +92,6 @@ private :
 
 	UPROPERTY(VisibleAnywhere, Category = Custom, meta = (AllowPrivateAccess = "true"))
 	AAIController* AIController;
-
-	/*UPROPERTY(EditAnywhere, Category = Custom, meta = (AllowPrivateAccess = "true"))
-	TArray<AActor*> TargetPoint;*/
 	
 	UPROPERTY(EditAnywhere, Category = Custom, meta = (AllowPrivateAccess = "true"))
 	AActor* TargetPoint;
@@ -90,13 +103,35 @@ private :
 	UFUNCTION()
 	void PlayerDetected(APawn* TargetActor);
 
+	void ChangeState(EEnemyState State);
+
 	UFUNCTION()
 	void ChangeTarget(APawn* TargetActor);
+
+	void ChangeSpeed(const float Speed) const;
+	void DecreaseSpeed(float DelayTime) const;
+	
+	FVector CalcNextMovementLocation(FNavLocation& DestLocation);
 
 	UPROPERTY(VisibleAnywhere, Category = Custom, meta = (AllowPrivateAccess = "true"))
 	float AcceptanceRadiusMax = 100.f;
 
+	UPROPERTY(VisibleAnywhere, Category = Custom, meta = (AllowPrivateAccess = "true"))
+	float PatrolRange = 3000.f;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Custom, meta = (AllowPrivateAccess = "true"))
 	EEnemyState EnemyState = EEnemyState::EES_Idle;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,  Category = Custom, meta = (AllowPrivateAccess = "true"))
+	float WalkSpeed = 100.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,  Category = Custom, meta = (AllowPrivateAccess = "true"))
+	float RunSpeed = 400.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,  Category = Custom, meta = (AllowPrivateAccess = "true"))
+	float RemainedDelayTime = 0.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,  Category = Custom, meta = (AllowPrivateAccess = "true"))
+	float MaxDelayTime = 30.f;
+	
 };

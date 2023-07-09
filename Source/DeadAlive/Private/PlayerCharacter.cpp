@@ -15,6 +15,7 @@
 #include "HUD/InventoryBar.h"
 #include "Items/Obstacles.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 
 /*
 if(GEngine)
