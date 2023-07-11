@@ -68,6 +68,7 @@ APlayerCharacter::APlayerCharacter()
 	// 오브젝트 설치 컴포넌트 생성
 	ObjectPlaceSceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("ObjectSceneComponent"));
 
+	this->Tags.Add(TEXT("Playerrr"));
 
 	// TransParent Object 생성
 	if(TransparentObstacles)

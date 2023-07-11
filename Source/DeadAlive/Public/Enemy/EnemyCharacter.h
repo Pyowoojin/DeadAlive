@@ -6,6 +6,7 @@
 #include "Navigation/PathFollowingComponent.h"
 #include "EnemyCharacter.generated.h"
 
+class AEnemyWeapon;
 class UPawnSensingComponent;
 class AAIController;
 class UParticleSystem;
@@ -20,6 +21,7 @@ enum class EEnemyState : uint8
 	EES_Combat UMETA(DisplayName = "Combat"),
 	EES_Chasing UMETA(DisplayName = "Chasing"),
 	EES_Patrol UMETA(DisplayName = "Patrol"),
+	EES_Attacking UMETA(DisplayName = "Attacking"),
 	EES_Dead UMETA(DisplayName = "Dead"),
 };
 
@@ -42,14 +44,15 @@ public:
 	void CreateNewPatrolJob();
 
 	UFUNCTION()
-	void DeleTest(FAIRequestID RequestID, EPathFollowingResult::Type Result);
-
+	void EnemyMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result);
 	void PlayAnimation(UAnimMontage* AnimMontage);
 	void StopMovement() const;
 	bool GetIsDead() const;
 	FORCEINLINE void TempFunc() { Destroy(); }
 
 	void DelayTimerFunction(const float DelayTimer);
+
+	void SpawnDefaultWeapon();
 	
 	UPROPERTY(BlueprintAssignable, VisibleAnywhere, BlueprintCallable, Category = "Custom")
 	FDynamicMultiDele Fuc_DeleMulti;
@@ -69,6 +72,10 @@ private :
 	bool bIsDead = false;
 
 	FTimerHandle DestroyTimer;
+	FTimerHandle AttackTimer;
+	bool bAttackTimer = false;
+	void AttackTimerEnd();
+	void AttackTimerStart();
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Custom, meta = (AllowPrivateAccess = "true"))
 	UParticleSystem* HitParticle;
@@ -90,6 +97,9 @@ private :
 	UPROPERTY(EditAnywhere, Category = Custom, meta = (AllowPrivateAccess = "true"))
 	UAnimMontage* HitAnimMontage;
 
+	UPROPERTY(EditAnywhere, Category = Custom, meta = (AllowPrivateAccess = "true"))
+	UAnimMontage* AttackMontage;
+
 	UPROPERTY(VisibleAnywhere, Category = Custom, meta = (AllowPrivateAccess = "true"))
 	AAIController* AIController;
 	
@@ -106,6 +116,11 @@ private :
 	void ChangeState(EEnemyState State);
 
 	UFUNCTION()
+	bool CanAttack(AActor* TargetActor);
+
+	bool TargetIsInRange(AActor* TargetActor, double Radius);
+
+	UFUNCTION()
 	void ChangeTarget(APawn* TargetActor);
 
 	void ChangeSpeed(const float Speed) const;
@@ -114,7 +129,7 @@ private :
 	FVector CalcNextMovementLocation(FNavLocation& DestLocation);
 
 	UPROPERTY(VisibleAnywhere, Category = Custom, meta = (AllowPrivateAccess = "true"))
-	float AcceptanceRadiusMax = 100.f;
+	float AcceptanceRadiusMax = 30.f;
 
 	UPROPERTY(VisibleAnywhere, Category = Custom, meta = (AllowPrivateAccess = "true"))
 	float PatrolRange = 3000.f;
@@ -133,5 +148,14 @@ private :
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,  Category = Custom, meta = (AllowPrivateAccess = "true"))
 	float MaxDelayTime = 30.f;
-	
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,  Category = Custom, meta = (AllowPrivateAccess = "true"))
+	double AttackRange = 100.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,  Category = Custom, meta = (AllowPrivateAccess = "true"))
+	float AttackDelay = 1.2f;
+
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AEnemyWeapon> WeaponClass;
 };
