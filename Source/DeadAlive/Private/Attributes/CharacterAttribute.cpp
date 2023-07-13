@@ -53,7 +53,7 @@ void UCharacterAttribute::RefreshAllTypeOfAmmo()
 	}
 }
 
-bool UCharacterAttribute::HasAmmo(EAmmoType AmmoType)
+bool UCharacterAttribute::HasAmmo(EAmmoType AmmoType) const
 {
 	if(AmmoMap.Contains(AmmoType) && AmmoMap[AmmoType] > 0)
 		return true;

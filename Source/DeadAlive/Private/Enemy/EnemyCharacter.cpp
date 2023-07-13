@@ -5,6 +5,7 @@
 #include "Engine/DamageEvents.h"
 #include "Perception/PawnSensingComponent.h"
 #include "NavigationSystem.h"
+#include "Attributes/EnemyAttribute.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -13,7 +14,7 @@ AEnemyCharacter::AEnemyCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
 	PawnSensingComponent = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComponent");
-	
+	CharAttribute = CreateDefaultSubobject<UEnemyAttribute>("CharAttribute");
 	PawnSensingComponent->SetPeripheralVisionAngle(37.5f);
 	PawnSensingComponent->SightRadius = 2300.f;
 
@@ -63,6 +64,22 @@ void AEnemyCharacter::CreateNewPatrolJob()
 	DrawDebugSphere(GetWorld(), Dest, 64.f, 32, FColor::Blue, false, 5.f);
 }
 
+void AEnemyCharacter::AttackStart()
+{
+	if(CharAttribute->GetEquippedWeapon() != nullptr)
+	{
+		CharAttribute->GetEquippedWeapon()->SetWeaponCollision();
+	}
+}
+
+void AEnemyCharacter::AttackEnd()
+{
+	if(CharAttribute->GetEquippedWeapon() != nullptr)
+	{
+		CharAttribute->GetEquippedWeapon()->SetWeaponNoCollision();
+	}
+}
+
 void AEnemyCharacter::EnemyMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result)
 {
 	if(Result == EPathFollowingResult::Success)
@@ -71,10 +88,10 @@ void AEnemyCharacter::EnemyMoveCompleted(FAIRequestID RequestID, EPathFollowingR
 		{
 			if(EnemyState == EEnemyState::EES_Combat)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("전투모드!"));
+				// UE_LOG(LogTemp, Warning, TEXT("전투모드!"));
 				if (CanAttack(TargetPoint))
 				{
-					UE_LOG(LogTemp, Warning, TEXT("We are under attack!"));
+					// UE_LOG(LogTemp, Warning, TEXT("We are under attack!"));
 					PlayAnimation(AttackMontage);
 					AttackTimerStart();
 				}
@@ -95,7 +112,7 @@ void AEnemyCharacter::EnemyMoveCompleted(FAIRequestID RequestID, EPathFollowingR
 void AEnemyCharacter::PlayerDetected(APawn* TargetActor)
 {
 	if(EnemyState == EEnemyState::EES_Dead || EnemyState == EEnemyState::EES_Chasing) return;
-	UE_LOG(LogTemp, Warning, TEXT("플레이어 디텍트"));
+	//UE_LOG(LogTemp, Warning, TEXT("플레이어 디텍트"));
 
 	TargetPoint = TargetActor;
 	ChangeSpeed(RunSpeed);
@@ -192,12 +209,12 @@ void AEnemyCharacter::PlayAnimation(UAnimMontage* AnimMontage)
 {
 	if(AnimMontage == nullptr)
 	{
-		UE_LOG(LogTemp, Error, TEXT("애니메이션이 없습니다."));
+		UE_LOG(LogTemp, Warning, TEXT("애니메이션없음"));
 		return;
 	}
 	if(UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("애니메이션 실행"));
+		// UE_LOG(LogTemp, Warning, TEXT("애니메이션 실행"));
 		int32 JumpSection = FMath::RandRange(1, AnimMontage->CompositeSections.Num());
 		FName SectionName = FName(*FString::Printf(TEXT("%d"), JumpSection));
 		AnimInstance->Montage_Play(AnimMontage);
@@ -223,11 +240,9 @@ void AEnemyCharacter::SpawnDefaultWeapon()
 	UWorld* World = GetWorld();
 	if(World && WeaponClass)
 	{
-		AEnemyWeapon* DefaultWeaponLeft = World->SpawnActor<AEnemyWeapon>(WeaponClass);
-		AEnemyWeapon* DefaultWeaponRight = World->SpawnActor<AEnemyWeapon>(WeaponClass);
-		DefaultWeaponLeft->Equip(GetMesh(), FName("LeftHandWeaponSocket"), this, this);
-		DefaultWeaponRight->Equip(GetMesh(), FName("RightHandWeaponSocket"), this, this);
-		
+		AEnemyWeapon* DefaultWeapon = World->SpawnActor<AEnemyWeapon>(WeaponClass);
+		DefaultWeapon->Equip(GetMesh(), FName("ZombieWeaponSocket"), this, this);
+		CharAttribute->SetEquippedWeapon(DefaultWeapon);
 	}
 }
 
@@ -251,10 +266,10 @@ void AEnemyCharacter::GetHit(const FVector& ImpactPoint, AActor* Hitter, const f
 		const FRotator RandRotator = ReturnRandomRotation();
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), BloodParticle, ImpactPoint, RandRotator);
 	}
+
+	CharAttribute->SetHealth(-TakeDamage(TakenDamage, DamageEvent, Hitter->GetInstigatorController(), Hitter));
 	
-	Health -= TakeDamage(TakenDamage, DamageEvent, Hitter->GetInstigatorController(), Hitter);
-	
-	if(Health <= 0.f && !bIsDead)
+	if(CharAttribute->GetCurrentHealth() <= 0.f && !bIsDead)
 	{
 		ChangeState(EEnemyState::EES_Dead);
 		PlayAnimation(DeathAnimMontage);
@@ -262,7 +277,7 @@ void AEnemyCharacter::GetHit(const FVector& ImpactPoint, AActor* Hitter, const f
 		StopMovement();
 		GetWorldTimerManager().SetTimer(DestroyTimer, this, &AEnemyCharacter::TempFunc, 1.4f);
 	}
-	else if (Health > 0.f)
+	else if (CharAttribute->GetCurrentHealth() > 0.f)
 	{
 		if(HitAnimMontage)
 		{
@@ -292,6 +307,6 @@ bool AEnemyCharacter::TargetIsInRange(AActor* TargetActor, double Radius)
 	if(TargetActor == nullptr) return false;
 	
 	const double DistanceToTarget = (TargetActor->GetActorLocation() - GetActorLocation()).Size();
-	UE_LOG(LogTemp, Warning, TEXT("액터와의 거리 : %f"), DistanceToTarget);
+	// UE_LOG(LogTemp, Warning, TEXT("액터와의 거리 : %f"), DistanceToTarget);
 	return DistanceToTarget <= Radius;
 }

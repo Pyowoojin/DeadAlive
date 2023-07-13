@@ -4,12 +4,13 @@
 #include "Components/ActorComponent.h"
 #include "Items/BaseWeapon.h"
 #include "AmmoType.h"
+#include "BaseCharacterAttribute.h"
 #include "CharacterAttribute.generated.h"
 
 class ABaseItem;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class DEADALIVE_API UCharacterAttribute : public UActorComponent
+class DEADALIVE_API UCharacterAttribute : public UBaseCharacterAttribute
 {
 	GENERATED_BODY()
 
@@ -32,7 +33,7 @@ public:
 	// 특정 총알 타입이 몇개 있는지 Return
 	int32 GetAmmoCountByAmmoType(EAmmoType AmmoType);
 	void RefreshAllTypeOfAmmo();
-	bool HasAmmo(EAmmoType AmmoType);
+	bool HasAmmo(EAmmoType AmmoType) const;
 	void InitializeAmmo();
 	
 protected:
@@ -40,18 +41,18 @@ protected:
 
 private :
 	/* 캐릭터 스탯? */
-	UPROPERTY(EditAnywhere, Category = "Character Attributes")
+	/*UPROPERTY(EditAnywhere, Category = "Character Attributes")
 	float Health = 100.f;
 	UPROPERTY(EditAnywhere, Category = "Character Attributes")
 	float MaxHealth = 100.f;
 	UPROPERTY(EditAnywhere, Category = "Character Attributes")
-	float Stamina = 100.f;
+	float Stamina = 100.f;*/
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item", meta = (AllowPrivateAccess = "true"))
+	ABaseWeapon* EquippedWeapon = nullptr;
 
 	UPROPERTY(VisibleAnywhere)
 	ABaseItem* OverlappedItem;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item", meta = (AllowPrivateAccess = "true"))
-	ABaseWeapon* EquippedWeapon = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item", meta = (AllowPrivateAccess = "true"))
 	TMap<EAmmoType, int32> AmmoMap;

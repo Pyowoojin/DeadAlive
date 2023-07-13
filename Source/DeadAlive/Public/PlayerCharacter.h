@@ -98,7 +98,7 @@ protected:
 
 	// 마지막 프레임에 도달한 항목을 참조하는 변수
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Items, meta = (AllowPrivateAccess = "true"))
-	class ABaseItem* TraceHitLastFrame;
+	ABaseItem* TraceHitLastFrame;
 
 	void StartCrosshairBulletFire();
 	

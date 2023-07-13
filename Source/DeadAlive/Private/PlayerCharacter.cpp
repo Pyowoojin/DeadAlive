@@ -68,7 +68,7 @@ APlayerCharacter::APlayerCharacter()
 	// 오브젝트 설치 컴포넌트 생성
 	ObjectPlaceSceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("ObjectSceneComponent"));
 
-	this->Tags.Add(TEXT("Playerrr"));
+	this->Tags.Add(TEXT("Player"));
 
 	// TransParent Object 생성
 	if(TransparentObstacles)
@@ -280,7 +280,7 @@ void APlayerCharacter::PutDownWeapon()
 	// 무기의 Collision과 Simulation을 켜주고 바닥에 버린다.
 	CharAttribute->GetEquippedWeapon()->ItemDivestiture();
 	CharAttribute->GetEquippedWeapon()->ThrowTheWeapon();
-	CharAttribute->SetEquippedWeapon(nullptr);
+	CharAttribute->SetEquippedWeapon(static_cast<ABaseWeapon*>(nullptr));
 	InventoryBar->ClearSlot();
 
 	// 플레이어 HUD 위젯 갱신
@@ -748,7 +748,7 @@ void APlayerCharacter::ChangeWeaponByNumKey(const int32 Num)
 		// 현재 무기의 기능을 꺼주고
 		CharAttribute->GetEquippedWeapon()->SetCollisionWhenItemChangeOFF();
 		// 장착 무기를 NULL로 바꿔준다.
-		CharAttribute->SetEquippedWeapon(nullptr);
+		CharAttribute->SetEquippedWeapon(static_cast<ABaseWeapon*>(nullptr));
 		UE_LOG(LogTemp,Warning, TEXT("1, 0 실행"));
 	}
 

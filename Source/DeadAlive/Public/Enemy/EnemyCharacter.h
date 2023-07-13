@@ -6,6 +6,8 @@
 #include "Navigation/PathFollowingComponent.h"
 #include "EnemyCharacter.generated.h"
 
+class UEnemyAttribute;
+class UBaseCharacterAttribute;
 class AEnemyWeapon;
 class UPawnSensingComponent;
 class AAIController;
@@ -42,6 +44,12 @@ public:
 	void MoveToPoint(AActor* GoalActor);
 	void EnemyInitialize();
 	void CreateNewPatrolJob();
+
+	UFUNCTION(BlueprintCallable)
+	void AttackStart();
+
+	UFUNCTION(BlueprintCallable)
+	void AttackEnd();
 
 	UFUNCTION()
 	void EnemyMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result);
@@ -129,7 +137,7 @@ private :
 	FVector CalcNextMovementLocation(FNavLocation& DestLocation);
 
 	UPROPERTY(VisibleAnywhere, Category = Custom, meta = (AllowPrivateAccess = "true"))
-	float AcceptanceRadiusMax = 30.f;
+	float AcceptanceRadiusMax = 15.f;
 
 	UPROPERTY(VisibleAnywhere, Category = Custom, meta = (AllowPrivateAccess = "true"))
 	float PatrolRange = 3000.f;
@@ -158,4 +166,9 @@ private :
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AEnemyWeapon> WeaponClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,  Category = Custom, meta = (AllowPrivateAccess = "true"))
+	UEnemyAttribute* CharAttribute;
+
+	
 };

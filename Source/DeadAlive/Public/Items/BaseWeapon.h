@@ -51,6 +51,9 @@ public :
 	FORCEINLINE UTexture2D* GetWeaponIcon() const { return WeaponIcon; }
 	FORCEINLINE FName GetAmmoCount() const { return AmmoCount; }
 
+protected:
+	
+	
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USceneComponent* FirePoint;
