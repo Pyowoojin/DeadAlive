@@ -19,6 +19,6 @@ class DEADALIVE_API IHitInterface
 
 	// 데미지를 받는 Interface함수. Enemy와 Player 둘 다 사용할 것임 추후 가스통 같은 아이템 액터도 고려
 	// virtual void GetHit(const FVector& ImpactPoint, AActor* Hitter) = 0;
-	virtual void GetHit(const FVector& ImpactPoint, AActor* Hitter, const float TakenDamage) = 0;
+	virtual void GetHit(const FVector& ImpactPoint, AActor* Hitter, const float TakenDamage);
 public:
 };

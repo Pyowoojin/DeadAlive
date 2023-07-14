@@ -15,7 +15,6 @@
 #include "HUD/InventoryBar.h"
 #include "Items/Obstacles.h"
 #include "Kismet/GameplayStatics.h"
-#include "Kismet/KismetMathLibrary.h"
 
 /*
 if(GEngine)
@@ -75,6 +74,7 @@ APlayerCharacter::APlayerCharacter()
 	{
 		
 	}
+	
 }
 
 void APlayerCharacter::IncrementOverlappedItemCount(int8 Amount)
@@ -118,13 +118,15 @@ void APlayerCharacter::BeginPlay()
 		HUDOverlay = CreateWidget<UUserWidget>(UGameplayStatics::GetPlayerController(this, 0), HUDOverlayClass);
 		if(HUDOverlay)
 		{
+			
 			HUDOverlay->AddToViewport(0);
 			HUDOverlay->SetVisibility(ESlateVisibility::Visible);
 			WeaponHUDWidget = Cast<UPlayerWeaponHUDWidget>(HUDOverlay->GetWidgetFromName(TEXT("BP_AmmoCount2")));
-
+			
 			InventoryBar = Cast<UInventoryBar>(HUDOverlay->GetWidgetFromName(TEXT("InventoryBarCopy")));
 			if(InventoryBar)
 			{
+				ShotDelegate.BindDynamic(InventoryBar, &UInventoryBar::RefreshAmmo);
 				InventoryBar->InitSlot(InventoryBar);
 				if(GEngine)
 				{
@@ -435,6 +437,7 @@ void APlayerCharacter::ReloadWeapon()
 
 	RefreshTheCurrentAmmoWidget();
 	RefreshAllTypeOfAmmoWidget();
+	ShotDelegate.Execute(CharAttribute->GetEquippedWeapon()->GetWeaponAttributes()->GetAmmoCount());
 	
 	if(ReloadMontage)
 	{
@@ -532,6 +535,7 @@ void APlayerCharacter::ShotKeyPressed(const FInputActionValue& Value)
 			
 			// 총 발사 함수 호출
 			CharAttribute->GetEquippedWeapon()->GunFire(ScreenTraceHit, this);
+			ShotDelegate.Execute(CharAttribute->GetEquippedWeapon()->GetWeaponAttributes()->GetAmmoCount());
 			RefreshTheCurrentAmmoWidget();
 
 			// 크로스헤어를 위한 총 발사 타이머 실행
@@ -836,47 +840,6 @@ void APlayerCharacter::PlaceObject()
 		UE_LOG(LogTemp, Warning, TEXT("설치완ㄹ뇨"));
 		GetWorld()->SpawnActor<AObstacles>(Obstacles, ObjectPlaceSceneComponent->GetComponentLocation(), GetActorRotation());
 	}
-
-
-
-	
-	/*
-	// 처음 눌렀을 때에는 물체가 배치될 위치만 보여주고, 두 번째 눌렀을 때에 물체를 배치해보자!
-	if(IsHandled)
-	{
-		DrawLineOfObstacles();
-		IsHandled = !IsHandled;
-		const FVector TargetLoc = GetActorLocation() + FVector(300.f, 0.f , 0.f);
-
-		if(TransparentObstacles)
-		{
-			if(GetScreenCenterToConvertWorld())
-			{
-				FHitResult Result;
-				// 물체를 설치할 위치 LineTrace -> 최종적으로는 닿지 않더라도 그냥 Z축으로 쭉 내려야할듯함.
-				GetWorld()->LineTraceSingleByChannel(Result, CrossHairWorldPosition, CrossHairWorldPosition + CrossHairWorldDirection * 5000, ECC_Visibility);
-				if(Result.bBlockingHit)
-				{
-					// 카메라 <-> 바닥 사이의 라인을 그림
-					DrawDebugLine(GetWorld(), CrossHairWorldPosition, Result.ImpactPoint, FColor::White, false, 3.f);
-					const FActorSpawnParameters SpawnParams;
-					ObjectPlaceSceneComponent->SetRelativeLocation(Result.ImpactPoint);
-					//GetWorld()->SpawnActor<AObstacles>(Obstacles, Result.ImpactPoint, GetActorRotation(), SpawnParams);
-					GetWorld()->SpawnActor<AObstacles>(Obstacles, ObjectPlaceSceneComponent->GetComponentLocation(), GetActorRotation(), SpawnParams);
-				}
-			}
-		}
-		else
-		{
-			FString MyString = TEXT("hello Unreal");
-			DebugTextLog(TEXT("Hello"));
-		}
-	}
-	else
-	{
-		IsHandled = !IsHandled;
-		DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + FVector(300.f, 0.f , 50.f), FColor::Red, false, 5.f);
-	}*/
 }
 
 
@@ -902,4 +865,9 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	Input->BindAction(NumKey4,  ETriggerEvent::Started, this, &APlayerCharacter::NumKey4Pressed);
 	Input->BindAction(NumKey5,  ETriggerEvent::Started, this, &APlayerCharacter::NumKey5Pressed);
 	Input->BindAction(PlaceObstacle,  ETriggerEvent::Started, this, &APlayerCharacter::PlaceObject);
+}
+
+void APlayerCharacter::GetHit(const FVector& ImpactPoint, AActor* Hitter, const float TakenDamage)
+{
+	CharAttribute->SetHealth(-TakenDamage);
 }

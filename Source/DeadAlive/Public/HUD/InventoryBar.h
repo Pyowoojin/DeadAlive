@@ -7,6 +7,7 @@
 #include "Interfaces/PickupInterface.h"
 #include "InventoryBar.generated.h"
 
+class APlayerCharacter;
 class ABaseWeapon;
 class UWeaponSlot;
 class UTextBlock;
@@ -31,7 +32,9 @@ public :
 	void InsertWeapon(ABaseWeapon* Weapon);
 	void InitSlot(const UInventoryBar* InventoryBar);
 	void ClearSlot();
-	void SetPointerLocation(int32 Location);
+	void SetPointerLocation(const int32 Location);
+	UFUNCTION()
+	void RefreshAmmo(const int32 Num);
 	
 	bool IsWeaponInThisSlot();
 	bool IsWeaponInThisSlot(const int Num);
@@ -88,4 +91,6 @@ private :
 
 	UPROPERTY(meta =(BindWidget))
 	UTextBlock* Weapon5Text;
+
+	
 };

@@ -24,6 +24,7 @@ public :
 
 	void Init();
 	void RefreshSlot(class ABaseWeapon* Weapon);
+	void RefreshAmmoCount(const int32 Num);
 	void ClearSlot();
 	
 private :

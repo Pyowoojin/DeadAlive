@@ -1,8 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "HUD/InventoryBar.h"
-
 #include "Attributes/WeaponAttributes.h"
 #include "Components/TextBlock.h"
 #include "HUD/WeaponSlot.h"
@@ -15,6 +11,8 @@ UInventoryBar::UInventoryBar(const FObjectInitializer &ObjectInitializer) : Supe
 	{
 		SlotCheck[i] = false;
 	}
+
+	
 }
 
 void UInventoryBar::InsertWeapon(ABaseWeapon* Weapon)
@@ -76,6 +74,12 @@ void UInventoryBar::SetPointerLocation(int32 Location)
 	Pointer = FMath::Clamp(Location, 0, MaxSlotSize);
 	
 	TextSlotArray[Pointer-1]->SetColorAndOpacity(FLinearColor::Red);
+}
+
+void UInventoryBar::RefreshAmmo(const int32 Num)
+{
+	// UE_LOG(LogTemp, Warning, TEXT("ehlldoasda"));
+	WeaponArray[Pointer-1].WeaponSlot->RefreshAmmoCount(Num);
 }
 
 // 해당 포인터 슬롯에 무기가 있다면 True, 없다면 False 반환

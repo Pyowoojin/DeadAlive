@@ -24,9 +24,25 @@ AEnemyCharacter::AEnemyCharacter()
 void AEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	AIController = Cast<AAIController>(GetController());
+	if(AIController)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("컨트롤러 생성"));
+	}
+	else if(AIController == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("컨트롤러 미생성"));
+	}
+
+	CreateController();
+	SpawnDefaultWeapon();
 	EnemyInitialize();
 	MoveToPoint(nullptr);
-	SpawnDefaultWeapon();
+
+	if(GetController())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("HELLOO"));
+	}
 }
 
 void AEnemyCharacter::AttackTimerEnd()
@@ -42,13 +58,13 @@ void AEnemyCharacter::AttackTimerStart()
 
 void AEnemyCharacter::EnemyInitialize()
 {
-	AIController = Cast<AAIController>(GetController());
-	
+	if(AIController)
+	{
+		AIController->ReceiveMoveCompleted.AddDynamic(this, &AEnemyCharacter::EnemyMoveCompleted);
+	}
 	if(PawnSensingComponent)
 	{
 		PawnSensingComponent->OnSeePawn.AddDynamic(this, &AEnemyCharacter::PlayerDetected);
-		AIController->ReceiveMoveCompleted.AddDynamic(this, &AEnemyCharacter::EnemyMoveCompleted);
-		// AIController->OnMoveCompleted.AddDynamic(this, &AEnemyCharacter::EnemyMoveCompleted);
 	}
 }
 
@@ -59,9 +75,24 @@ void AEnemyCharacter::CreateNewPatrolJob()
 	FNavLocation DestNavLocation;
 	const FVector Dest = CalcNextMovementLocation(DestNavLocation);
 	ChangeState(EEnemyState::EES_Patrol);
-	AIController->MoveToLocation(Dest, AcceptanceRadiusMax);
+	if(AIController)
+		AIController->MoveToLocation(Dest, AcceptanceRadiusMax);
 	ChangeSpeed(WalkSpeed);
 	DrawDebugSphere(GetWorld(), Dest, 64.f, 32, FColor::Blue, false, 5.f);
+}
+
+void AEnemyCharacter::CreateController()
+{
+	if(GetController() == nullptr)
+	{
+		this->SpawnDefaultController();
+	}
+
+	if(AIController == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("생성완료"));
+		AIController = Cast<AAIController>(GetController());
+	}
 }
 
 void AEnemyCharacter::AttackStart()
@@ -117,8 +148,13 @@ void AEnemyCharacter::PlayerDetected(APawn* TargetActor)
 	TargetPoint = TargetActor;
 	ChangeSpeed(RunSpeed);
 	ChangeState(EEnemyState::EES_Combat);
-	
-	AIController->MoveToActor(TargetActor, AcceptanceRadiusMax);
+
+	if(AIController)
+		AIController->MoveToActor(TargetActor, AcceptanceRadiusMax);
+	else
+	{
+		AIController = Cast<AAIController>(GetController());
+	}
 }
 
 void AEnemyCharacter::ChangeTarget(APawn* TargetActor)
@@ -275,6 +311,7 @@ void AEnemyCharacter::GetHit(const FVector& ImpactPoint, AActor* Hitter, const f
 		PlayAnimation(DeathAnimMontage);
 		bIsDead = true;
 		StopMovement();
+		CharAttribute->GetEquippedWeapon()->Destroy();
 		GetWorldTimerManager().SetTimer(DestroyTimer, this, &AEnemyCharacter::TempFunc, 1.4f);
 	}
 	else if (CharAttribute->GetCurrentHealth() > 0.f)

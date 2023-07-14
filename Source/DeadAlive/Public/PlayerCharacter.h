@@ -4,6 +4,7 @@
 #include "AmmoType.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
+#include "Interfaces/HitInterface.h"
 #include "Interfaces/PickupInterface.h"
 #include "PlayerCharacter.generated.h"
 
@@ -22,6 +23,7 @@ class UWeaponSlot;
 class UInventoryBar;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FEquipItemDelegate, int32, CurrentSlotIndex, int32, NewSlotIndex);
+DECLARE_DYNAMIC_DELEGATE_OneParam(FShotDelegate_OneParam, int32, Number);
 
 UENUM(BlueprintType)
 enum class ECombatState : uint8
@@ -33,7 +35,7 @@ enum class ECombatState : uint8
 };
 
 UCLASS()
-class DEADALIVE_API APlayerCharacter : public ACharacter, public IPickupInterface
+class DEADALIVE_API APlayerCharacter : public ACharacter, public IPickupInterface, public IHitInterface
 {
 	GENERATED_BODY()
 
@@ -44,6 +46,11 @@ public:
 	APlayerCharacter();
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	//virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter, const float TakenDamage) override;
+	// virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter, const float TakenDamage) override;
+	// virtual void GetHit(const FVector& ImpactPoint, AActor* Hitter, const float TakenDamage) override;
+	virtual void GetHit(const FVector& ImpactPoint, AActor* Hitter, const float TakenDamage) override;
+	
 	FORCEINLINE bool GetAiming() const { return bAiming; }
 	FORCEINLINE ECombatState GetCombatState() const { return CombatState; }
 	
@@ -259,6 +266,9 @@ private:
 	// 무기를 습득할 때 인벤토리 바로 슬롯 정보를 보내기 위한 델리게이트
 	UPROPERTY(BlueprintAssignable, Category = Delegates, meta = (AllowPrivateAccess = "true"))
 	FEquipItemDelegate EquipItemDelegate;
+
+	// UPROPERTY(BlueprintAssignable, Category = Delegates, meta = (AllowPrivateAccess = "true"))
+	FShotDelegate_OneParam ShotDelegate;
 
 	// HUD에 대한 레퍼런스
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SLATE_CULL_WIDGETS, meta = (AllowPrivateAccess = "true"))

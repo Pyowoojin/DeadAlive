@@ -44,6 +44,7 @@ public:
 	void MoveToPoint(AActor* GoalActor);
 	void EnemyInitialize();
 	void CreateNewPatrolJob();
+	void CreateController();
 
 	UFUNCTION(BlueprintCallable)
 	void AttackStart();
@@ -108,7 +109,7 @@ private :
 	UPROPERTY(EditAnywhere, Category = Custom, meta = (AllowPrivateAccess = "true"))
 	UAnimMontage* AttackMontage;
 
-	UPROPERTY(VisibleAnywhere, Category = Custom, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, Category = Custom, meta = (AllowPrivateAccess = "true"))
 	AAIController* AIController;
 	
 	UPROPERTY(EditAnywhere, Category = Custom, meta = (AllowPrivateAccess = "true"))

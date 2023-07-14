@@ -7,7 +7,6 @@
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
-#include "HUD/InventoryBar.h"
 #include "Items/BaseWeapon.h"
 #include "Styling/SlateBrush.h"
 
@@ -47,6 +46,12 @@ void UWeaponSlot::RefreshSlot(ABaseWeapon* Weapon)
 
 	const int32 WeaponAmmo = Weapon->GetWeaponAttributes()->GetAmmoCount();
 	const FText TextAmount = FText::FromString(FString::Printf(TEXT("%d"), WeaponAmmo));
+	WeaponAmmoCount->SetText(TextAmount);
+}
+
+void UWeaponSlot::RefreshAmmoCount(const int32 Num)
+{
+	const FText TextAmount = FText::FromString(FString::Printf(TEXT("%d"), Num));
 	WeaponAmmoCount->SetText(TextAmount);
 }
 
