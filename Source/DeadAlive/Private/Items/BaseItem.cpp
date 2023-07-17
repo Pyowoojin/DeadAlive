@@ -6,21 +6,22 @@
 #include "Components/WidgetComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "HUD/WeaponInfoWidget.h"
+#include "Components/StaticMeshComponent.h"
 
 ABaseItem::ABaseItem()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	// 루트 - 스켈레탈 메시 - 중력 활성화, 시뮬레이트 활성화, 모든 채널 블록, 카메라는 무시
-	Skm = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
-	SetRootComponent(Skm);
-	Skm->SetCollisionResponseToAllChannels(ECR_Block);
-	Skm->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
-	Skm->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
-	Skm->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	SKM = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
+	SetRootComponent(SKM);
+	SKM->SetCollisionResponseToAllChannels(ECR_Block);
+	SKM->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	SKM->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	SKM->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 
 	// (스켈레탈 메시 - 스피어 콜리전) - 오버랩 이벤트 생성, 콜리전 프리셋 OverlapAllDynamic
 	SphereCollision = CreateDefaultSubobject<USphereComponent>(TEXT("SphereCollision"));
-	SphereCollision->SetupAttachment(Skm);
+	SphereCollision->SetupAttachment(SKM);
 	SphereCollision->SetGenerateOverlapEvents(true);
 	SphereCollision->SetCollisionObjectType(ECC_WorldDynamic);
 	SphereCollision->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
@@ -52,10 +53,7 @@ void ABaseItem::BeginPlay()
 	}
 	
 	WeaponInfo = Cast<UWeaponInfoWidget>(PickupWidget->GetUserWidgetObject());
-	/*if(WeaponAttributes && WeaponInfo)
-	{
-		WeaponInfo->SetItemName(WeaponAttributes->GetItemName());
-	}*/
+
 	SetActiveStarts();
 	
 }
@@ -155,9 +153,9 @@ void ABaseItem::NoticeRangeOverlapEnd(UPrimitiveComponent* OverlappedComponent, 
 
 void ABaseItem::ThrowTheWeapon()
 {
-	const FVector MeshForward { Skm->GetForwardVector() };
+	const FVector MeshForward { SKM->GetForwardVector() };
 	const FVector ThrowDirection = MeshForward.RotateAngleAxis(-50.f, MeshForward);
-	Skm->AddImpulse(ThrowDirection*1500.f);
+	SKM->AddImpulse(ThrowDirection*1500.f);
 }
 
 void ABaseItem::PlayWeaponPickupSound()

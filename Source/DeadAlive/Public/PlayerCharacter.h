@@ -8,6 +8,8 @@
 #include "Interfaces/PickupInterface.h"
 #include "PlayerCharacter.generated.h"
 
+class UInventorySystemHUD;
+class UInventoryComponent;
 class AObstacles;
 class USpringArmComponent;
 class UCameraComponent;
@@ -92,6 +94,7 @@ protected:
 	void NumKey3Pressed();
 	void NumKey4Pressed();
 	void NumKey5Pressed();
+	void ShowInventory();
 	
 	/* 입력 함수 END*/
 
@@ -172,7 +175,6 @@ private:
 	UInputAction* InputShotChange;
 	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputAction* InputReload;
-
 	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputAction* NumKey1;
 	UPROPERTY(EditAnywhere, Category = "Input")
@@ -185,7 +187,11 @@ private:
 	UInputAction* NumKey5;
 	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputAction* PlaceObstacle;
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* TabKey_Inventory;
+	
 
+	bool InventoryVisible = false;
 	
 	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputMappingContext* InputMapping;
@@ -283,6 +289,12 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SLATE_CULL_WIDGETS, meta = (AllowPrivateAccess = "true"))
 	UInventoryBar* InventoryBar;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SLATE_CULL_WIDGETS, meta = (AllowPrivateAccess = "true"))
+	UInventoryComponent* InventorySystemComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SLATE_CULL_WIDGETS, meta = (AllowPrivateAccess = "true"))
+	UInventorySystemHUD* InventorySystemHUD;
 
 	// 물체 추적 관련 변수 & 함수들 모음
 	FTimerHandle DrawObstacleLineTimer;

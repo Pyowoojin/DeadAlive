@@ -69,7 +69,7 @@ void ABaseWeapon::ItemAcquisition(USceneComponent* InParent, AActor* NewOwner)
 	this->Owner = NewOwner;
 	SetCollisionWhenItemChangeOFF();
 
-	Skm->SetVisibility(true);
+	SKM->SetVisibility(true);
 	SetItemState(EItemState::EIS_Equipped);
 }
 
@@ -77,9 +77,9 @@ void ABaseWeapon::ItemAcquisition(USceneComponent* InParent, AActor* NewOwner)
 void ABaseWeapon::SetCollisionWhenItemChangeOFF()
 {
 	// 물리 효과, OverlapSphere들 전부 끄고
-	Skm->SetSimulatePhysics(false);
-	Skm->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	Skm->SetVisibility(false);
+	SKM->SetSimulatePhysics(false);
+	SKM->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	SKM->SetVisibility(false);
 	SphereCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	NoticeSphereCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
@@ -91,11 +91,11 @@ void ABaseWeapon::SetCollisionWhenItemChangeOFF()
 // 아이템을 다시 떨어트릴 때 -> 콜리전, 시뮬레이션을 모아놓은 함수
 void ABaseWeapon::SetCollisionWhenItemDivestiture()
 {
-	if(Skm && SphereCollision && NoticeSphereCollision)
+	if(SKM && SphereCollision && NoticeSphereCollision)
 	{
 		this->Owner = nullptr;
-		Skm->SetSimulatePhysics(true);
-		Skm->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+		SKM->SetSimulatePhysics(true);
+		SKM->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 		SphereCollision->SetCollisionResponseToAllChannels(ECR_Overlap);
 		SphereCollision->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
 		SphereCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
@@ -111,7 +111,7 @@ void ABaseWeapon::SetCollisionWhenItemChangeON()
 	//SetCollisionWhenItemDivestiture();
 
 	// 매쉬까지 다시 보이게 하기
-	Skm->SetVisibility(true);
+	SKM->SetVisibility(true);
 	
 }
 

@@ -38,8 +38,9 @@ class UGameplayStatics;
 class UParticleSystem;
 class UWidgetComponent;
 class UWeaponInfoWidget;
+class UTexture2D;
 
-UCLASS()
+UCLASS(Blueprintable)
 class DEADALIVE_API ABaseItem : public AActor
 {
 	GENERATED_BODY()
@@ -49,7 +50,6 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 protected:
-	
 	virtual void BeginPlay() override;
 
 	// 희귀도 기반으로 별의 개수를 Active시킴
@@ -83,7 +83,7 @@ protected:
 
 	// 아이템 스켈레탈 메시
 	UPROPERTY(EditAnywhere)
-	USkeletalMeshComponent* Skm;
+	USkeletalMeshComponent* SKM;
 
 	// 무기를 줍거나 특성을 볼 때 사용되는 콜리전
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -97,11 +97,11 @@ public :
 	FORCEINLINE UWidgetComponent* GetPickupWidget() const { return PickupWidget; }
 	FORCEINLINE EItemState GetItemState() const { return ItemState; }
 	FORCEINLINE void SetItemState(EItemState State ) { ItemState = State; }
-	FORCEINLINE USkeletalMeshComponent* GetSkeletalMesh() const { return Skm; }
+	FORCEINLINE USkeletalMeshComponent* GetSkeletalMesh() const { return SKM; }
 
 	// 커스텀 뎁스 활성화, 비활성화
-	FORCEINLINE void EnableCustomDepth() const { Skm->SetRenderCustomDepth(true); }
-	FORCEINLINE void DisableCustomDepth() const { Skm->SetRenderCustomDepth(false);}
+	FORCEINLINE void EnableCustomDepth() const { SKM->SetRenderCustomDepth(true); }
+	FORCEINLINE void DisableCustomDepth() const { SKM->SetRenderCustomDepth(false);}
 	
 
 	void ThrowTheWeapon();
@@ -112,8 +112,7 @@ public :
 	// TSubClass ㄱㄱ
 	UPROPERTY()
 	UWeaponInfoWidget* WeaponInfo = nullptr;
-	/*UPROPERTY() -> 왜 안 되는거임?
-	TSubclassOf<UWeaponInfoWidget> WeaponInfo = nullptr;*/
+
 private :
 	UPROPERTY(EditAnywhere, Category = "Sounds", meta = (AllowPrivateAccess = "true"))
 	USoundWave* EquipSound;

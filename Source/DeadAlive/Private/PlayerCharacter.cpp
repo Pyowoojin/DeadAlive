@@ -14,6 +14,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "HUD/InventoryBar.h"
 #include "Items/Obstacles.h"
+#include "CustomComponent/InventoryComponent.h"
+#include "HUD/Inventory/InventorySystemHUD.h"
 #include "Kismet/GameplayStatics.h"
 
 /*
@@ -66,14 +68,10 @@ APlayerCharacter::APlayerCharacter()
 
 	// 오브젝트 설치 컴포넌트 생성
 	ObjectPlaceSceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("ObjectSceneComponent"));
+	InventorySystemComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
 
 	this->Tags.Add(TEXT("Player"));
-
-	// TransParent Object 생성
-	if(TransparentObstacles)
-	{
-		
-	}
+	
 	
 }
 
@@ -113,6 +111,13 @@ void APlayerCharacter::BeginPlay()
 		CharAttribute->InitializeAmmo();
 	}
 
+	/*if(InventorySystemHUD)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("인벤토리시스템"));
+		InventorySystemHUD->AddToViewport(0);
+		InventorySystemHUD->SetVisibility(ESlateVisibility::Visible);
+	}*/
+
 	if(HUDOverlayClass)
 	{
 		HUDOverlay = CreateWidget<UUserWidget>(UGameplayStatics::GetPlayerController(this, 0), HUDOverlayClass);
@@ -128,19 +133,21 @@ void APlayerCharacter::BeginPlay()
 			{
 				ShotDelegate.BindDynamic(InventoryBar, &UInventoryBar::RefreshAmmo);
 				InventoryBar->InitSlot(InventoryBar);
-				if(GEngine)
+				/*if(GEngine)
 				{
 					GEngine->AddOnScreenDebugMessage(1733, 5.f, FColor::Black, TEXT("Cast 성공"));
-				}
+				}*/
+			}
+			InventorySystemHUD = Cast<UInventorySystemHUD>(HUDOverlay->GetWidgetFromName(TEXT("WBP_InventorySystem")));
+			if(InventorySystemHUD)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("캐스팅 성공!!"));
+				InventorySystemHUD->SetVisibility(ESlateVisibility::Hidden);
 			}
 			else
 			{
-				if(GEngine)
-				{
-					GEngine->AddOnScreenDebugMessage(1734, 5.f, FColor::Black, TEXT("Cast 실패"));
-				}
+				UE_LOG(LogTemp, Warning, TEXT("캐스팅 실패!!"));
 			}
-
 
 			RefreshAllTypeOfAmmoWidget();
 		}
@@ -721,6 +728,19 @@ void APlayerCharacter::NumKey5Pressed()
 	InventoryBar->SetPointerLocation(5);
 }
 
+void APlayerCharacter::ShowInventory()
+{
+	if(InventorySystemHUD)
+	{
+		if(InventoryVisible)
+			InventorySystemHUD->SetVisibility(ESlateVisibility::Hidden);
+		else
+			InventorySystemHUD->SetVisibility(ESlateVisibility::Visible);
+
+		InventoryVisible = !InventoryVisible;
+	}
+}
+
 
 void APlayerCharacter::ChangeWeaponByNumKey(const int32 Num)
 {
@@ -865,6 +885,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	Input->BindAction(NumKey4,  ETriggerEvent::Started, this, &APlayerCharacter::NumKey4Pressed);
 	Input->BindAction(NumKey5,  ETriggerEvent::Started, this, &APlayerCharacter::NumKey5Pressed);
 	Input->BindAction(PlaceObstacle,  ETriggerEvent::Started, this, &APlayerCharacter::PlaceObject);
+	Input->BindAction(TabKey_Inventory, ETriggerEvent::Started, this, &APlayerCharacter::ShowInventory);
 }
 
 void APlayerCharacter::GetHit(const FVector& ImpactPoint, AActor* Hitter, const float TakenDamage)
