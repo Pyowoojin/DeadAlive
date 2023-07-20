@@ -8,6 +8,7 @@
 #include "Interfaces/PickupInterface.h"
 #include "PlayerCharacter.generated.h"
 
+class UInventoryItemHUD;
 class UInventorySystemHUD;
 class UInventoryComponent;
 class AObstacles;
@@ -48,9 +49,6 @@ public:
 	APlayerCharacter();
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	//virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter, const float TakenDamage) override;
-	// virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter, const float TakenDamage) override;
-	// virtual void GetHit(const FVector& ImpactPoint, AActor* Hitter, const float TakenDamage) override;
 	virtual void GetHit(const FVector& ImpactPoint, AActor* Hitter, const float TakenDamage) override;
 	
 	FORCEINLINE bool GetAiming() const { return bAiming; }
@@ -72,6 +70,9 @@ public:
 	// Getter함수 //
 	FORCEINLINE UCharacterAttribute* GetCharAttribute() const { return CharAttribute; }
 	FORCEINLINE int8 GetOverlappedItemCount() const { return OverlappedItemCount; }
+
+	UInventoryComponent* GetInventoryComponent();
+	UInventorySystemHUD* GetInventorySystemHUD();
 
 protected:
 	virtual void BeginPlay() override;
@@ -289,12 +290,23 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SLATE_CULL_WIDGETS, meta = (AllowPrivateAccess = "true"))
 	UInventoryBar* InventoryBar;
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SLATE_CULL_WIDGETS, meta = (AllowPrivateAccess = "true"))
 	UInventoryComponent* InventorySystemComponent;
 
+	// 플-케
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SLATE_CULL_WIDGETS, meta = (AllowPrivateAccess = "true"))
 	UInventorySystemHUD* InventorySystemHUD;
+
+	// 플-케
+	// UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SLATE_CULL_WIDGETS, meta = (AllowPrivateAccess = "true"))
+	// UInventoryItemHUD* InventoryItemHUD;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SLATE_CULL_WIDGETS, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<UUserWidget> InventoryItemHUD;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SLATE_CULL_WIDGETS, meta = (AllowPrivateAccess = "true"))
+	UUserWidget* AddingInventoryItemHUD;
 
 	// 물체 추적 관련 변수 & 함수들 모음
 	FTimerHandle DrawObstacleLineTimer;

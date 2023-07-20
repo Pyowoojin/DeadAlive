@@ -8,6 +8,7 @@ void IPickupInterface::OverlappingItem(ABaseItem* Item)
 {
 }
 
-void IPickupInterface::IPickUpItem(ABaseWeapon* Weapon)
+void IPickupInterface::IPickUpItem(ABaseItem* Item, APlayerCharacter* Player)
 {
+	
 }

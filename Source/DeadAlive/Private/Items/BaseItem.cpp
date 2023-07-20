@@ -164,10 +164,10 @@ void ABaseItem::PlayWeaponPickupSound()
 }
 
 // 오버라이드해서 사용할거임
-void ABaseItem::PickUpItem(APlayerCharacter* Player)
+/*void ABaseItem::PickUpItem(APlayerCharacter* Player)
 {
 	PlayWeaponPickupSound();
-}
+}*/
 
 void ABaseItem::OnSphereOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
@@ -182,3 +182,10 @@ void ABaseItem::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
+
+void ABaseItem::IPickUpItem(ABaseItem* Item, APlayerCharacter* Player)
+{
+	IPickupInterface::IPickUpItem(Item, Player);
+	PlayWeaponPickupSound();
+}
+

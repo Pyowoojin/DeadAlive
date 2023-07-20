@@ -15,6 +15,7 @@
 #include "HUD/InventoryBar.h"
 #include "Items/Obstacles.h"
 #include "CustomComponent/InventoryComponent.h"
+#include "HUD/Inventory/InventoryItemHUD.h"
 #include "HUD/Inventory/InventorySystemHUD.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -89,6 +90,29 @@ void APlayerCharacter::IncrementOverlappedItemCount(int8 Amount)
 	}
 }
 
+UInventoryComponent* APlayerCharacter::GetInventoryComponent()
+{
+	if(InventorySystemComponent)
+	{
+		return InventorySystemComponent;
+	}
+	return nullptr;
+}
+
+UInventorySystemHUD* APlayerCharacter::GetInventorySystemHUD()
+{
+	if(InventorySystemHUD)
+	{
+		return InventorySystemHUD;
+	}
+	
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("HUD System 얻어오기 실퓨ㅐ"));
+		return nullptr;
+	}
+}
+
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -133,16 +157,13 @@ void APlayerCharacter::BeginPlay()
 			{
 				ShotDelegate.BindDynamic(InventoryBar, &UInventoryBar::RefreshAmmo);
 				InventoryBar->InitSlot(InventoryBar);
-				/*if(GEngine)
-				{
-					GEngine->AddOnScreenDebugMessage(1733, 5.f, FColor::Black, TEXT("Cast 성공"));
-				}*/
 			}
 			InventorySystemHUD = Cast<UInventorySystemHUD>(HUDOverlay->GetWidgetFromName(TEXT("WBP_InventorySystem")));
 			if(InventorySystemHUD)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("캐스팅 성공!!"));
-				InventorySystemHUD->SetVisibility(ESlateVisibility::Hidden);
+				UE_LOG(LogTemp, Warning, TEXT("인벤토리 시스템 HUD 캐스팅 성공!!"));
+				
+				//InventorySystemHUD->SetVisibility(ESlateVisibility::Hidden);
 			}
 			else
 			{
@@ -167,17 +188,13 @@ void APlayerCharacter::TraceForItems()
 		if(ItemTraceResult.bBlockingHit)
 		{
 			ABaseItem* HitItem = Cast<ABaseItem>(ItemTraceResult.GetActor());
-			if(GEngine)
-			{
-				const FString Name = ItemTraceResult.GetActor()->GetName();
-				GEngine->AddOnScreenDebugMessage(173, 0.1f, FColor::Black, Name, false);
-			}
+			
 			if(HitItem && HitItem->GetPickupWidget())
 			{
-				
 				// 위젯 활성화
 				HitItem->GetPickupWidget()->SetVisibility(true);
 				HitItem->EnableCustomDepth();
+				
 			}
 			/* 다음 프레임을 위한 HitItem 레퍼런스 저장
 			 * 만약, 아이템에 CrossHair를 올려 무기의 정보를 얻어오는 위젯을 발동시켰다면, HitItem은 그 아이템으로 저장이 될 것이다.
@@ -189,8 +206,11 @@ void APlayerCharacter::TraceForItems()
 				// 다른 아이템으로 바뀌었거나, nullptr이 될 경우 Setting the Visibility 
 				if(HitItem != TraceHitLastFrame)
 				{
-					TraceHitLastFrame->GetPickupWidget()->SetVisibility(false);
-					TraceHitLastFrame->DisableCustomDepth();
+					if(TraceHitLastFrame->GetPickupWidget())
+					{
+						TraceHitLastFrame->GetPickupWidget()->SetVisibility(false);
+						TraceHitLastFrame->DisableCustomDepth();
+					}
 				}
 			}
 			TraceHitLastFrame = HitItem;
@@ -253,7 +273,7 @@ void APlayerCharacter::EKeyPressed()
 			InventoryBar->InsertWeapon(PassingWeapon);
 		}
 		
-		Item->PickUpItem(this);
+		Item->IPickUpItem(Item, this);
 		RefreshAllTypeOfAmmoWidget();
 		
 		// 무기의 이름과 그 무기가 가진 총알 개수를 갱신한다.
@@ -739,6 +759,15 @@ void APlayerCharacter::ShowInventory()
 
 		InventoryVisible = !InventoryVisible;
 	}
+
+	/*if(InventoryItemHUD)
+	{
+		AddingInventoryItemHUD = CreateWidget<UInventoryItemHUD>(GetWorld(), InventoryItemHUD);
+		if(AddingInventoryItemHUD)
+		{
+			AddingInventoryItemHUD->AddToViewport(0);
+		}
+	}*/
 }
 
 

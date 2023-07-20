@@ -14,7 +14,8 @@ class DEADALIVE_API AAmmunition : public ABaseItem
 		AAmmunition();
 	virtual void Tick(float DeltaSeconds) override;
 	void SetItemNameForWidget() const;
-	virtual void PickUpItem(APlayerCharacter* Player) override;
+	virtual void IPickUpItem(ABaseItem* Item, APlayerCharacter* Player) override;
+	// virtual void PickUpItem(APlayerCharacter* Player) override;
 
 protected:
 	virtual void BeginPlay() override;

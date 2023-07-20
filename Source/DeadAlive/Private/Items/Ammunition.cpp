@@ -24,13 +24,22 @@ void AAmmunition::SetItemNameForWidget() const
 	}
 }
 
+void AAmmunition::IPickUpItem(ABaseItem* Item, APlayerCharacter* Player)
+{
+	Super::IPickUpItem(Item, Player);
+	Player->GetCharAttribute()->SetAmmoCountForAmmoType(ItemAttributes->GetWeaponType(), ItemAttributes->GetAmmoCount());
+	Destroy();
+}
+
+
+/*
 void AAmmunition::PickUpItem(APlayerCharacter* Player)
 {
 	Super::PickUpItem(Player);
 	Player->GetCharAttribute()->SetAmmoCountForAmmoType(ItemAttributes->GetWeaponType(), ItemAttributes->GetAmmoCount());
 	
 	Destroy();
-}
+}*/
 
 void AAmmunition::BeginPlay()
 {

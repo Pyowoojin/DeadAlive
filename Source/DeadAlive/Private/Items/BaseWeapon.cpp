@@ -15,11 +15,13 @@
 #include "Engine/DamageEvents.h"
 #include "HUD/WeaponInfoWidget.h"
 
+/*
 void ABaseWeapon::IPickUpItem(ABaseWeapon* Weapon)
 {
 	IPickupInterface::IPickUpItem(Weapon);
 	UE_LOG(LogTemp, Warning, TEXT("그거받음ㅋ"));
 }
+*/
 
 ABaseWeapon::ABaseWeapon()
 {
@@ -126,14 +128,13 @@ void ABaseWeapon::NoticeRangeBeginOverlap(UPrimitiveComponent* OverlappedCompone
 	}
 }
 
-void ABaseWeapon::PickUpItem(APlayerCharacter* Player){
-
+void ABaseWeapon::IPickUpItem(ABaseItem* Item, APlayerCharacter* Player)
+{
 	if(Player->GetCharAttribute()->GetEquippedWeapon()) return;
-	Super::PickUpItem(Player);
-	
+	Super::IPickUpItem(Item, Player);
+		
 	Player->GetCharAttribute()->SetEquippedWeapon(this);
 	ItemAcquisition(Player->GetMesh(), Player);
-	
 }
 
 void ABaseWeapon::PlayFireSound()

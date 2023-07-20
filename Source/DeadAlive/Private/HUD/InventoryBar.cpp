@@ -106,7 +106,9 @@ ABaseWeapon* UInventoryBar::GetWeaponInSlot(int Num)
 	return nullptr;
 }
 
+/*
 void UInventoryBar::IPickUpItem(ABaseWeapon* Item)
 {
 	IPickupInterface::IPickUpItem(Item);
 }
+*/

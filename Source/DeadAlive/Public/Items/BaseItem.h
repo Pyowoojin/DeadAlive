@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Interfaces/PickupInterface.h"
 #include "BaseItem.generated.h"
 
 class APlayerCharacter;
@@ -41,13 +42,14 @@ class UWeaponInfoWidget;
 class UTexture2D;
 
 UCLASS(Blueprintable)
-class DEADALIVE_API ABaseItem : public AActor
+class DEADALIVE_API ABaseItem : public AActor, public IPickupInterface
 {
 	GENERATED_BODY()
 	
 public:	
 	ABaseItem();
 	virtual void Tick(float DeltaTime) override;
+	virtual void IPickUpItem(ABaseItem* Item, APlayerCharacter* Player) override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -100,14 +102,14 @@ public :
 	FORCEINLINE USkeletalMeshComponent* GetSkeletalMesh() const { return SKM; }
 
 	// 커스텀 뎁스 활성화, 비활성화
-	FORCEINLINE void EnableCustomDepth() const { SKM->SetRenderCustomDepth(true); }
-	FORCEINLINE void DisableCustomDepth() const { SKM->SetRenderCustomDepth(false);}
+	FORCEINLINE void EnableCustomDepth() const { if(SKM) SKM->SetRenderCustomDepth(true); }
+	FORCEINLINE void DisableCustomDepth() const { if(SKM) SKM->SetRenderCustomDepth(false);}
 	
 
 	void ThrowTheWeapon();
 	void PlayWeaponPickupSound();
 
-	virtual void PickUpItem(APlayerCharacter* Player);
+	// virtual void PickUpItem(APlayerCharacter* Player);
 
 	// TSubClass ㄱㄱ
 	UPROPERTY()

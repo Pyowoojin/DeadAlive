@@ -6,6 +6,7 @@
 #include "UObject/Interface.h"
 #include "PickupInterface.generated.h"
 
+class APlayerCharacter;
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
 class UPickupInterface : public UInterface
@@ -23,6 +24,6 @@ class DEADALIVE_API IPickupInterface
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 	public:
 	virtual void OverlappingItem(class ABaseItem* Item);
-	virtual void IPickUpItem(class ABaseWeapon* Weapon);
+	virtual void IPickUpItem(class ABaseItem* Item, APlayerCharacter* Player);
 	
 };

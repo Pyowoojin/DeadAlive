@@ -24,7 +24,7 @@ struct FArrayStruct
 };
 
 UCLASS()
-class DEADALIVE_API UInventoryBar : public UUserWidget, public IPickupInterface
+class DEADALIVE_API UInventoryBar : public UUserWidget// , public IPickupInterface
 {
 	GENERATED_BODY()
 public :
@@ -41,7 +41,7 @@ public :
 	ABaseWeapon* GetWeaponInSlot(int Pointer);
 	
 	FORCEINLINE int32 GetPointerLocation() const { return Pointer; }
-	virtual void IPickUpItem(ABaseWeapon* Weapon) override;
+	//virtual void IPickUpItem(ABaseWeapon* Weapon) override;
 
 private :
 	UPROPERTY(VisibleAnywhere, Category = "Custom", meta = (AllowPrivateAccess = "true"))

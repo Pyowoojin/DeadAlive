@@ -16,13 +16,13 @@ class UGameplayStatics;
 class UParticleSystem;
 
 UCLASS()
-class DEADALIVE_API ABaseWeapon : public ABaseItem, public IPickupInterface
+class DEADALIVE_API ABaseWeapon : public ABaseItem // IPickUpInterface
 {
 	GENERATED_BODY()
 
 public :
 
-	virtual void IPickUpItem(ABaseWeapon* Weapon) override;
+	//virtual void IPickUpItem(ABaseWeapon* Weapon) override;
 	
 	ABaseWeapon();
 	virtual void BeginPlay() override;
@@ -71,7 +71,8 @@ private:
 	UParticleSystem* BeamParticle;
 	
 	virtual void NoticeRangeBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult) override;
-	virtual void PickUpItem(APlayerCharacter* Player) override;
+// 	virtual void PickUpItem(APlayerCharacter* Player) override;
+	virtual void IPickUpItem(ABaseItem* Item, APlayerCharacter* Player) override;
 
 	// 총 발사 관련 변수
 	FVector FirePointVector;
