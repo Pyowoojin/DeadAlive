@@ -45,6 +45,7 @@ public:
 	void EnemyInitialize();
 	void CreateNewPatrolJob();
 	void CreateController();
+	
 
 	UFUNCTION(BlueprintCallable)
 	void AttackStart();

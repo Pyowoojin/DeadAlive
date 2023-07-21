@@ -311,6 +311,13 @@ void AEnemyCharacter::GetHit(const FVector& ImpactPoint, AActor* Hitter, const f
 		PlayAnimation(DeathAnimMontage);
 		bIsDead = true;
 		StopMovement();
+
+		
+		/*GetRootComponent()->SetActive(false);
+		GetMesh()->SetActive(false);
+		const FString GetName = GetRootComponent()->GetName();
+		UE_LOG(LogTemp, Warning, TEXT("%s"), *GetName);*/
+		
 		CharAttribute->GetEquippedWeapon()->Destroy();
 		GetWorldTimerManager().SetTimer(DestroyTimer, this, &AEnemyCharacter::TempFunc, 1.4f);
 	}

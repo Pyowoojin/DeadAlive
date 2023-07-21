@@ -119,6 +119,8 @@ protected:
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Combat, meta = (AllowPrivateAccess = "true"))
 	ECombatState CombatState = ECombatState::ECS_Unoccupied;
+
+	FORCEINLINE APlayerController* GetPlayerController_Custom() { return GetWorld()->GetFirstPlayerController(); }
 	
 	bool CanIShoot() const;
 	void SetWeapon(ABaseWeapon* Item);
@@ -134,6 +136,10 @@ private:
 	void ShootingModeChange();
 	void PutDownWeapon();
 	void ChangeWeaponByNumKey(const int32 Num);
+
+	// InputMode 변경
+	void SetInputModeUIOnly();
+	void SetInputModeGameViewOnly();
 
 	// 재장전 함수
 	void ReloadButtonPressed();

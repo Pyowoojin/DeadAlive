@@ -8,6 +8,7 @@
 #include "Blueprint/UserWidget.h"
 #include "EnhancedInputSubsystems.h"
 #include "Attributes/WeaponAttributes.h"
+#include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Components/WidgetComponent.h"
 #include "Engine/World.h"
 #include "HUD/PlayerWeaponHUDWidget.h"
@@ -162,8 +163,7 @@ void APlayerCharacter::BeginPlay()
 			if(InventorySystemHUD)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("인벤토리 시스템 HUD 캐스팅 성공!!"));
-				
-				//InventorySystemHUD->SetVisibility(ESlateVisibility::Hidden);
+				InventorySystemHUD->SetVisibility(ESlateVisibility::Hidden);
 			}
 			else
 			{
@@ -748,14 +748,39 @@ void APlayerCharacter::NumKey5Pressed()
 	InventoryBar->SetPointerLocation(5);
 }
 
+void APlayerCharacter::SetInputModeUIOnly()
+{
+	if(APlayerController* MyController = GetWorld()->GetFirstPlayerController())
+	{
+		UWidgetBlueprintLibrary::SetInputMode_GameAndUIEx(MyController);
+		MyController->SetShowMouseCursor(true);
+	}
+}
+
+void APlayerCharacter::SetInputModeGameViewOnly()
+{
+	if(APlayerController* MyController = GetWorld()->GetFirstPlayerController())
+	{
+		UWidgetBlueprintLibrary::SetInputMode_GameOnly(MyController);
+		MyController->SetShowMouseCursor(false);
+	}
+}
+
 void APlayerCharacter::ShowInventory()
 {
 	if(InventorySystemHUD)
 	{
 		if(InventoryVisible)
+		{
+			SetInputModeGameViewOnly();
 			InventorySystemHUD->SetVisibility(ESlateVisibility::Hidden);
+			
+		}
 		else
+		{
+			SetInputModeUIOnly();
 			InventorySystemHUD->SetVisibility(ESlateVisibility::Visible);
+		}
 
 		InventoryVisible = !InventoryVisible;
 	}
