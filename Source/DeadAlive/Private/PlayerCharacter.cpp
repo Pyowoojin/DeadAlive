@@ -774,7 +774,7 @@ void APlayerCharacter::ShowInventory()
 		{
 			SetInputModeGameViewOnly();
 			InventorySystemHUD->SetVisibility(ESlateVisibility::Hidden);
-			
+			InventorySystemHUD->CloseAllOfChildWidget();
 		}
 		else
 		{
@@ -784,15 +784,6 @@ void APlayerCharacter::ShowInventory()
 
 		InventoryVisible = !InventoryVisible;
 	}
-
-	/*if(InventoryItemHUD)
-	{
-		AddingInventoryItemHUD = CreateWidget<UInventoryItemHUD>(GetWorld(), InventoryItemHUD);
-		if(AddingInventoryItemHUD)
-		{
-			AddingInventoryItemHUD->AddToViewport(0);
-		}
-	}*/
 }
 
 
@@ -848,6 +839,30 @@ void APlayerCharacter::ChangeWeaponByNumKey(const int32 Num)
 	{
 		CharAttribute->GetEquippedWeapon()->PlayWeaponPickupSound();
 		RefreshTheCurrentAmmoWidget();
+	}
+}
+
+void APlayerCharacter::LoadBlueprintFunc()
+{
+	UE_LOG(LogTemp, Warning, TEXT("LoadBluePrintFunc"));
+	// FString RelativePath = FPaths::ProjectContentDir() + TEXT("Blueprint/Item/Weapon/BP_BaseWeapon");
+	FString RelativePath = TEXT("/Game/Blueprint/Item/Weapon/BP_BaseWeapon");
+	
+	UBlueprint* BlueprintAsset = Cast<UBlueprint>(LoadObject<UBlueprint>(nullptr, *RelativePath));
+
+	if(BlueprintAsset)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("에셋 생성 성공"));
+		UClass* BlueprintClass = BlueprintAsset->GeneratedClass;
+		if(BlueprintClass)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("액터 생성 성공"));
+			ABaseWeapon* WeaponToSpawn = GetWorld()->SpawnActor<ABaseWeapon>(BlueprintClass, this->GetActorLocation(), this->GetActorRotation());
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("에셋 생성 실패"));
 	}
 }
 
@@ -940,6 +955,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	Input->BindAction(NumKey5,  ETriggerEvent::Started, this, &APlayerCharacter::NumKey5Pressed);
 	Input->BindAction(PlaceObstacle,  ETriggerEvent::Started, this, &APlayerCharacter::PlaceObject);
 	Input->BindAction(TabKey_Inventory, ETriggerEvent::Started, this, &APlayerCharacter::ShowInventory);
+	Input->BindAction(LoadBlueprint, ETriggerEvent::Started, this, &APlayerCharacter::LoadBlueprintFunc);
 }
 
 void APlayerCharacter::GetHit(const FVector& ImpactPoint, AActor* Hitter, const float TakenDamage)

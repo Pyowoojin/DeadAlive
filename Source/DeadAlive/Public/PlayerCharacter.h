@@ -136,6 +136,7 @@ private:
 	void ShootingModeChange();
 	void PutDownWeapon();
 	void ChangeWeaponByNumKey(const int32 Num);
+	void LoadBlueprintFunc();
 
 	// InputMode 변경
 	void SetInputModeUIOnly();
@@ -196,9 +197,11 @@ private:
 	UInputAction* PlaceObstacle;
 	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputAction* TabKey_Inventory;
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* LoadBlueprint;
 	
 
-	bool InventoryVisible = false;
+	
 	
 	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputMappingContext* InputMapping;
@@ -246,6 +249,9 @@ private:
 
 	// 이번 프레임의 줌 위치
 	float CurrentCameraFOV = 0.f;
+
+	// 인벤토리 활성화 여부
+	bool InventoryVisible = false;
 
 	// 줌 속도 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -303,10 +309,6 @@ private:
 	// 플-케
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SLATE_CULL_WIDGETS, meta = (AllowPrivateAccess = "true"))
 	UInventorySystemHUD* InventorySystemHUD;
-
-	// 플-케
-	// UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SLATE_CULL_WIDGETS, meta = (AllowPrivateAccess = "true"))
-	// UInventoryItemHUD* InventoryItemHUD;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SLATE_CULL_WIDGETS, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<UUserWidget> InventoryItemHUD;
