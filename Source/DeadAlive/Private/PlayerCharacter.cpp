@@ -16,7 +16,7 @@
 #include "HUD/InventoryBar.h"
 #include "Items/Obstacles.h"
 #include "CustomComponent/InventoryComponent.h"
-#include "HUD/Inventory/InventoryItemHUD.h"
+#include "HUD/Inventory/HUD_InventorySystem.h"
 #include "HUD/Inventory/InventorySystemHUD.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -70,6 +70,7 @@ APlayerCharacter::APlayerCharacter()
 
 	// 오브젝트 설치 컴포넌트 생성
 	ObjectPlaceSceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("ObjectSceneComponent"));
+	
 	InventorySystemComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
 
 	this->Tags.Add(TEXT("Player"));
@@ -100,7 +101,7 @@ UInventoryComponent* APlayerCharacter::GetInventoryComponent()
 	return nullptr;
 }
 
-UInventorySystemHUD* APlayerCharacter::GetInventorySystemHUD()
+UHUD_InventorySystem* APlayerCharacter::GetInventorySystemHUD()
 {
 	if(InventorySystemHUD)
 	{
@@ -136,12 +137,12 @@ void APlayerCharacter::BeginPlay()
 		CharAttribute->InitializeAmmo();
 	}
 
-	/*if(InventorySystemHUD)
+	if(InventorySystemHUD)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("인벤토리시스템"));
 		InventorySystemHUD->AddToViewport(0);
-		InventorySystemHUD->SetVisibility(ESlateVisibility::Visible);
-	}*/
+		InventorySystemHUD->SetVisibility(ESlateVisibility::Hidden);
+	}
 
 	if(HUDOverlayClass)
 	{
@@ -159,7 +160,7 @@ void APlayerCharacter::BeginPlay()
 				ShotDelegate.BindDynamic(InventoryBar, &UInventoryBar::RefreshAmmo);
 				InventoryBar->InitSlot(InventoryBar);
 			}
-			InventorySystemHUD = Cast<UInventorySystemHUD>(HUDOverlay->GetWidgetFromName(TEXT("WBP_InventorySystem")));
+			InventorySystemHUD = Cast<UHUD_InventorySystem>(HUDOverlay->GetWidgetFromName(TEXT("WBP_InventorySystem")));
 			if(InventorySystemHUD)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("인벤토리 시스템 HUD 캐스팅 성공!!"));
@@ -768,13 +769,17 @@ void APlayerCharacter::SetInputModeGameViewOnly()
 
 void APlayerCharacter::ShowInventory()
 {
+	UE_LOG(LogTemp, Warning, TEXT("인벤톨;실행실행"));
 	if(InventorySystemHUD)
 	{
 		if(InventoryVisible)
 		{
 			SetInputModeGameViewOnly();
 			InventorySystemHUD->SetVisibility(ESlateVisibility::Hidden);
-			InventorySystemHUD->CloseAllOfChildWidget();
+
+			// 위젯 브로드캐스트
+			InventorySystemComponent->FSelectionChangeDel.Broadcast();
+			
 		}
 		else
 		{
@@ -783,6 +788,10 @@ void APlayerCharacter::ShowInventory()
 		}
 
 		InventoryVisible = !InventoryVisible;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("인벤톨;실행TLFVO"));
 	}
 }
 

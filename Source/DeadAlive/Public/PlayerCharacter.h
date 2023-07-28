@@ -8,6 +8,7 @@
 #include "Interfaces/PickupInterface.h"
 #include "PlayerCharacter.generated.h"
 
+class UHUD_InventorySystem;
 class UInventoryItemHUD;
 class UInventorySystemHUD;
 class UInventoryComponent;
@@ -72,7 +73,7 @@ public:
 	FORCEINLINE int8 GetOverlappedItemCount() const { return OverlappedItemCount; }
 
 	UInventoryComponent* GetInventoryComponent();
-	UInventorySystemHUD* GetInventorySystemHUD();
+	UHUD_InventorySystem* GetInventorySystemHUD();
 
 protected:
 	virtual void BeginPlay() override;
@@ -85,6 +86,7 @@ protected:
 	void CharMove(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void RefreshAllTypeOfAmmoWidget();
+	UFUNCTION()
 	void EKeyPressed();
 	void InitPlayerWeaponHUD();
 	void RunKeyPressed(const FInputActionValue& Value);
@@ -307,8 +309,11 @@ private:
 	UInventoryComponent* InventorySystemComponent;
 
 	// 플-케
+	/*UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SLATE_CULL_WIDGETS, meta = (AllowPrivateAccess = "true"))
+	UInventorySystemHUD* InventorySystemHUD;*/
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SLATE_CULL_WIDGETS, meta = (AllowPrivateAccess = "true"))
-	UInventorySystemHUD* InventorySystemHUD;
+	UHUD_InventorySystem* InventorySystemHUD;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SLATE_CULL_WIDGETS, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<UUserWidget> InventoryItemHUD;
