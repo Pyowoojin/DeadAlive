@@ -67,6 +67,7 @@ public:
 	UPROPERTY(BlueprintAssignable, VisibleAnywhere, BlueprintCallable, Category = "Custom")
 	FDynamicMultiDele Fuc_DeleMulti;
 	FTimerHandle PatrolTimer;
+	FTimerHandle ChaseTimer;
 	
 
 protected:
@@ -114,7 +115,7 @@ private :
 	AAIController* AIController;
 	
 	UPROPERTY(EditAnywhere, Category = Custom, meta = (AllowPrivateAccess = "true"))
-	AActor* TargetPoint;
+	APawn* TargetPawn;
 
 	// AI 관련
 	UPROPERTY(VisibleAnywhere)
@@ -123,12 +124,17 @@ private :
 	UFUNCTION()
 	void PlayerDetected(APawn* TargetActor);
 
+	UFUNCTION()
+	void ChaseTarget();
+
 	void ChangeState(EEnemyState State);
 
-	UFUNCTION()
-	bool CanAttack(AActor* TargetActor);
+	APawn* ChooseTargetActor(APawn* NewTarget);
 
-	bool TargetIsInRange(AActor* TargetActor, double Radius);
+	UFUNCTION()
+	bool CanAttack(APawn* TargetActor);
+
+	bool TargetIsInRange(APawn* TargetActor, double Radius);
 
 	UFUNCTION()
 	void ChangeTarget(APawn* TargetActor);
@@ -138,8 +144,8 @@ private :
 	
 	FVector CalcNextMovementLocation(FNavLocation& DestLocation);
 
-	UPROPERTY(VisibleAnywhere, Category = Custom, meta = (AllowPrivateAccess = "true"))
-	float AcceptanceRadiusMax = 15.f;
+	UPROPERTY(EditAnywhere, Category = Custom, meta = (AllowPrivateAccess = "true"))
+	float AcceptanceRadiusMax = 50.f;
 
 	UPROPERTY(VisibleAnywhere, Category = Custom, meta = (AllowPrivateAccess = "true"))
 	float PatrolRange = 3000.f;

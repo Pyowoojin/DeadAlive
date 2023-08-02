@@ -73,7 +73,8 @@ APlayerCharacter::APlayerCharacter()
 	
 	InventorySystemComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
 
-	this->Tags.Add(TEXT("Player"));
+	// this->Tags.Add(FName("Player"));
+	Tags.Add(FName("Player"));
 	
 	
 }
@@ -880,7 +881,9 @@ void APlayerCharacter::DrawLineOfObstacles()
 	// 오브젝트 설치키가 꺼졌다면 함수 종료
 	if(!IsHandled)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("오브젝트 설치 종료!"));
 		SpawnedObstacle->SetHidden(true);
+		SpawnedObstacle->SetActorHiddenInGame(true);
 		GetWorldTimerManager().ClearTimer(DrawObstacleLineTimer);
 		return;
 	}
@@ -929,13 +932,22 @@ void APlayerCharacter::PlaceObject()
 		{
 			UE_LOG(LogTemp, Warning, TEXT("엘스핸들"));
 			SpawnedObstacle->SetHidden(false);
+			// SpawnedObstacle->SetActorHiddenInGame(false);
 		}
 		
 		GetWorldTimerManager().SetTimer(DrawObstacleLineTimer, this, &APlayerCharacter::DrawLineOfObstacles, 0.05f, true);
 	}
 	else{
+		SpawnedObstacle->SetHidden(false);
 		SpawnedObstacle->SetHidden(true);
-		UE_LOG(LogTemp, Warning, TEXT("설치완ㄹ뇨"));
+		
+		if(SpawnedObstacle->IsHidden())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("숨겨줌"));			
+		}
+		
+		// SpawnedObstacle->SetActorHiddenInGame(true);
+		UE_LOG(LogTemp, Warning, TEXT("설치완료"));
 		GetWorld()->SpawnActor<AObstacles>(Obstacles, ObjectPlaceSceneComponent->GetComponentLocation(), GetActorRotation());
 	}
 }

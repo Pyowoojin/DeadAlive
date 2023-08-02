@@ -15,21 +15,21 @@ AEnemyCharacter::AEnemyCharacter()
 	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
 	PawnSensingComponent = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComponent");
 	CharAttribute = CreateDefaultSubobject<UEnemyAttribute>("CharAttribute");
-	PawnSensingComponent->SetPeripheralVisionAngle(37.5f);
+	PawnSensingComponent->SetPeripheralVisionAngle(42.5f);
 	PawnSensingComponent->SightRadius = 2300.f;
+	PawnSensingComponent->bOnlySensePlayers = false;
 
+	this->bUseControllerRotationYaw = true;
+	this->BaseEyeHeight = 32.f;
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 	
 }
 void AEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	PawnSensingComponent->SetSensingInterval(0.7f);
 	AIController = Cast<AAIController>(GetController());
-	if(AIController)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("컨트롤러 생성"));
-	}
-	else if(AIController == nullptr)
+	if(AIController == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("컨트롤러 미생성"));
 	}
@@ -48,6 +48,10 @@ void AEnemyCharacter::BeginPlay()
 void AEnemyCharacter::AttackTimerEnd()
 {
 	bAttackTimer = false;
+	ChangeState(EEnemyState::EES_Combat);
+	// FAIRequestID 
+	EnemyMoveCompleted(0, EPathFollowingResult::Success);
+	// CreateNewPatrolJob();
 }
 
 void AEnemyCharacter::AttackTimerStart()
@@ -117,14 +121,82 @@ void AEnemyCharacter::EnemyMoveCompleted(FAIRequestID RequestID, EPathFollowingR
 	{
 		if(AIController)
 		{
-			if(EnemyState == EEnemyState::EES_Combat)
+			if(EnemyState != EEnemyState::EES_Attacking)
 			{
 				// UE_LOG(LogTemp, Warning, TEXT("전투모드!"));
-				if (CanAttack(TargetPoint))
+
+				// 타겟 폰이 없는게 아니라면 공격할 수 있는지 확인한다. 
+				if(TargetPawn == nullptr)
 				{
-					// UE_LOG(LogTemp, Warning, TEXT("We are under attack!"));
+					// 다시 패트롤 실행
+					ChangeSpeed(WalkSpeed);
+					const float RandomTime = FMath::RandRange(1.f, 5.f);
+					GetWorld()->GetTimerManager().SetTimer(PatrolTimer, this, &AEnemyCharacter::CreateNewPatrolJob, RandomTime);
+				}
+				else if(!CanAttack(TargetPawn))
+				{
+					// 적 추적 시행
+					ChangeSpeed(RunSpeed);
+
+					// 모든 것을 Pawn으로 바꿔야함 Actor는 옳지 않아요
+					
+
+					// Problem 문제 -> 여러번 실행되는 이유가 뭐지? AIMoveTo가 계속 완수가 됨. 이걸 해결하기 위해서는?
+					// ChangeTarget(NewPawn);
+					GetWorld()->GetTimerManager().SetTimer(ChaseTimer, this, &AEnemyCharacter::ChaseTarget, 1.f);
+					// ChaseTarget(TargetPawn);
+				}
+				else if(CanAttack(TargetPawn))
+				{
+					// 공격 실행
+					FVector DirectionToPlayer = TargetPawn->GetActorLocation() - this->GetActorLocation();
+					
+					DrawDebugSphere(GetWorld(), DirectionToPlayer, 30.f, 12, FColor::Blue, false, 3.f);
+					DirectionToPlayer.Normalize();
+
+					DrawDebugLine(GetWorld(), this->GetActorLocation(), this->GetActorLocation() + DirectionToPlayer * 50.f, FColor::Red, false, 3.f);
+					DrawDebugSphere(GetWorld(), this->GetActorLocation() + DirectionToPlayer * 50, 30.f, 12, FColor::Red, false, 3.f);
+					// UE_LOG(LogTemp, Warning, TEXT("%f, %f, %f"), DirectionToPlayer.X, DirectionToPlayer.Y, DirectionToPlayer.Z);
+
+					const FRotator NewRotation = DirectionToPlayer.Rotation();
+
+					UE_LOG(LogTemp, Warning, TEXT(" 원래 방향 : %s"), *this->GetActorRotation().ToString());
+					this->FaceRotation(NewRotation, 0);
+					// this->SetActorRotation(NewRotation);
+					UE_LOG(LogTemp, Warning, TEXT(" 조정 후  방향 : %s"), *NewRotation.ToString());
+					
+					
 					PlayAnimation(AttackMontage);
 					AttackTimerStart();
+				}
+				
+				/*if (CanAttack(TargetPawn))
+				{
+					ChangeState(EEnemyState::EES_Attacking);
+					// UE_LOG(LogTemp, Warning, TEXT("We are under attack!"));
+
+
+					FVector DirectionToPlayer = TargetPawn->GetActorLocation() - this->GetActorLocation();
+					
+					DrawDebugSphere(GetWorld(), DirectionToPlayer, 30.f, 12, FColor::Blue, false, 3.f);
+					DirectionToPlayer.Normalize();
+
+					DrawDebugLine(GetWorld(), this->GetActorLocation(), this->GetActorLocation() + DirectionToPlayer * 50.f, FColor::Red, false, 3.f);
+					DrawDebugSphere(GetWorld(), this->GetActorLocation() + DirectionToPlayer * 50, 30.f, 12, FColor::Red, false, 3.f);
+					// UE_LOG(LogTemp, Warning, TEXT("%f, %f, %f"), DirectionToPlayer.X, DirectionToPlayer.Y, DirectionToPlayer.Z);
+
+					const FRotator NewRotation = DirectionToPlayer.Rotation();
+
+					UE_LOG(LogTemp, Warning, TEXT(" 원래 방향 : %s"), *this->GetActorRotation().ToString());
+					this->FaceRotation(NewRotation, 0);
+					// this->SetActorRotation(NewRotation);
+					UE_LOG(LogTemp, Warning, TEXT(" 조정 후  방향 : %s"), *NewRotation.ToString());
+					
+					
+					PlayAnimation(AttackMontage);
+					AttackTimerStart();
+
+					
 				}
 				else
 				{
@@ -135,6 +207,7 @@ void AEnemyCharacter::EnemyMoveCompleted(FAIRequestID RequestID, EPathFollowingR
 			{
 				const float RandomTime = FMath::RandRange(1.f, 5.f);
 				GetWorld()->GetTimerManager().SetTimer(PatrolTimer, this, &AEnemyCharacter::CreateNewPatrolJob, RandomTime);
+			}*/
 			}
 		}
 	}
@@ -142,18 +215,33 @@ void AEnemyCharacter::EnemyMoveCompleted(FAIRequestID RequestID, EPathFollowingR
 
 void AEnemyCharacter::PlayerDetected(APawn* TargetActor)
 {
-	if(EnemyState == EEnemyState::EES_Dead || EnemyState == EEnemyState::EES_Chasing) return;
-	//UE_LOG(LogTemp, Warning, TEXT("플레이어 디텍트"));
+	// if(EnemyState == EEnemyState::EES_Dead || EnemyState == EEnemyState::EES_Chasing) return;
+	if(EnemyState == EEnemyState::EES_Dead) return;
+	UE_LOG(LogTemp, Warning, TEXT("플레이어 디텍트 이름 : %s"), *TargetActor->GetName());
 
-	TargetPoint = TargetActor;
+	// auto TP = Cast<AActor>(TargetActor);
+		
+	TargetPawn = ChooseTargetActor(TargetActor);
 	ChangeSpeed(RunSpeed);
-	ChangeState(EEnemyState::EES_Combat);
+	ChangeState(EEnemyState::EES_Chasing);
 
 	if(AIController)
-		AIController->MoveToActor(TargetActor, AcceptanceRadiusMax);
+	{
+		// AIController->StopMovement();
+		AIController->MoveToActor(TargetPawn, AcceptanceRadiusMax);
+	}
 	else
 	{
 		AIController = Cast<AAIController>(GetController());
+	}
+}
+
+void AEnemyCharacter::ChaseTarget()
+{
+	if(AIController)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("체이스 타겟"));
+		AIController->MoveToActor(TargetPawn);
 	}
 }
 
@@ -161,8 +249,11 @@ void AEnemyCharacter::ChangeTarget(APawn* TargetActor)
 {
 	if(AIController && EnemyState != EEnemyState::EES_Dead)
 	{
-		TargetPoint = TargetActor;
+		TargetPawn = TargetActor;
+
+		// problem /  문제
 		AIController->MoveToActor(TargetActor);
+		ChangeSpeed(RunSpeed);
 		ChangeState(EEnemyState::EES_Chasing);
 	}
 }
@@ -288,7 +379,8 @@ void AEnemyCharacter::GetHit(const FVector& ImpactPoint, AActor* Hitter, const f
 	
 	if(const auto Target = Cast<APawn>(Hitter))
 	{
-		PlayerDetected(Target);
+		//PlayerDetected(Target);
+		ChangeTarget(Target);
 	}
 	
 	if(HitSound)
@@ -312,12 +404,6 @@ void AEnemyCharacter::GetHit(const FVector& ImpactPoint, AActor* Hitter, const f
 		bIsDead = true;
 		StopMovement();
 
-		
-		/*GetRootComponent()->SetActive(false);
-		GetMesh()->SetActive(false);
-		const FString GetName = GetRootComponent()->GetName();
-		UE_LOG(LogTemp, Warning, TEXT("%s"), *GetName);*/
-		
 		CharAttribute->GetEquippedWeapon()->Destroy();
 		GetWorldTimerManager().SetTimer(DestroyTimer, this, &AEnemyCharacter::TempFunc, 1.4f);
 	}
@@ -335,9 +421,21 @@ void AEnemyCharacter::ChangeState(EEnemyState State)
 	EnemyState = State;
 }
 
-bool AEnemyCharacter::CanAttack(AActor* TargetActor)
+APawn* AEnemyCharacter::ChooseTargetActor(APawn* NewTarget)
 {
-	if(EEnemyState::EES_Dead == EnemyState || EEnemyState::EES_Attacking == EnemyState || bAttackTimer) return false;
+	const FVector ThisActorLocation = this->GetActorLocation();
+
+	// 현재 타겟보다 새로운 타겟의 위치가 가깝다면 NewTargetReturn
+	if(TargetPawn == nullptr || (ThisActorLocation - NewTarget->GetActorLocation()).Length() < (ThisActorLocation - TargetPawn->GetActorLocation()).Length() )
+	{
+		return NewTarget;
+	}
+	return TargetPawn;
+}
+
+bool AEnemyCharacter::CanAttack(APawn* TargetActor)
+{
+	if(TargetPawn == nullptr || EEnemyState::EES_Dead == EnemyState || EEnemyState::EES_Attacking == EnemyState || bAttackTimer) return false;
 
 	if(TargetIsInRange(TargetActor, AttackRange))
 	{
@@ -346,11 +444,11 @@ bool AEnemyCharacter::CanAttack(AActor* TargetActor)
 	return false;
 }
 
-bool AEnemyCharacter::TargetIsInRange(AActor* TargetActor, double Radius)
+bool AEnemyCharacter::TargetIsInRange(APawn* TargetActor, double Radius)
 {
 	if(TargetActor == nullptr) return false;
 	
 	const double DistanceToTarget = (TargetActor->GetActorLocation() - GetActorLocation()).Size();
-	// UE_LOG(LogTemp, Warning, TEXT("액터와의 거리 : %f"), DistanceToTarget);
+	UE_LOG(LogTemp, Warning, TEXT("액터와의 거리 : %f, AttackRadiance : %f"), DistanceToTarget, AttackRange);
 	return DistanceToTarget <= Radius;
 }

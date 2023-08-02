@@ -7,7 +7,7 @@
 class UStaticMeshComponent;
 
 UCLASS()
-class DEADALIVE_API AObstacles : public AActor
+class DEADALIVE_API AObstacles : public APawn
 {
 	GENERATED_BODY()
 	
