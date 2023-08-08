@@ -7,6 +7,7 @@
 #include "EnemyAnimInstance.generated.h"
 
 class AEnemyCharacter;
+class ACharacter;
 class UCharacterMovementComponent;
 /**
  * 
@@ -21,13 +22,14 @@ public :
 	virtual void NativeInitializeAnimation() override;
 	
 	
-private :
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	AEnemyCharacter* EnemyCharacter;
-
+protected :
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UCharacterMovementComponent* CharMovement;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	float Speed;
+
+private :
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	AEnemyCharacter* ThisCharacter;
 };

@@ -8,10 +8,10 @@
 void UEnemyAnimInstance::NativeInitializeAnimation()
 {
 	Super::NativeInitializeAnimation();
-	EnemyCharacter = Cast<AEnemyCharacter>(TryGetPawnOwner());
-	if(EnemyCharacter)
+	ThisCharacter = Cast<AEnemyCharacter>(TryGetPawnOwner());
+	if(ThisCharacter)
 	{
-		CharMovement = EnemyCharacter->GetCharacterMovement();
+		CharMovement = ThisCharacter->GetCharacterMovement();
 	}
 }
 

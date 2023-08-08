@@ -8,6 +8,7 @@ void UPlayerAnimInstance::NativeInitializeAnimation()
 	Super::NativeInitializeAnimation();
 	// 방향과 속도를 계산하기 위해 캐릭터의 무브먼트 컴포넌트를 받아온다.
 	PlayerCharacter = Cast<APlayerCharacter>(TryGetPawnOwner());
+	
 	if (PlayerCharacter) {
 		PlayerCharacterMovement = PlayerCharacter->GetCharacterMovement();
 	}

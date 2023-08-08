@@ -26,6 +26,10 @@ void UWeaponSlot::Init()
 	{
 		WeaponIcon->SetVisibility(ESlateVisibility::Hidden);
 	}
+	if(AmmoIcon)
+	{
+		AmmoIcon->SetVisibility(ESlateVisibility::Hidden);
+	}
 }
 
 void UWeaponSlot::RefreshSlot(ABaseWeapon* Weapon)
