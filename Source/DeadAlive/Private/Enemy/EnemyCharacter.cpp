@@ -6,6 +6,7 @@
 #include "Perception/PawnSensingComponent.h"
 #include "NavigationSystem.h"
 #include "Attributes/EnemyAttribute.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -13,15 +14,19 @@ AEnemyCharacter::AEnemyCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECollisionResponse::ECR_Ignore);
 	PawnSensingComponent = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComponent");
 	CharAttribute = CreateDefaultSubobject<UEnemyAttribute>("CharAttribute");
 	PawnSensingComponent->SetPeripheralVisionAngle(42.5f);
 	PawnSensingComponent->SightRadius = 2300.f;
 	PawnSensingComponent->bOnlySensePlayers = false;
+	
 
 	this->bUseControllerRotationYaw = true;
 	this->BaseEyeHeight = 32.f;
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+	this->Tags.Add("Enemy");
+	this->GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 	
 }
 void AEnemyCharacter::BeginPlay()
@@ -169,45 +174,6 @@ void AEnemyCharacter::EnemyMoveCompleted(FAIRequestID RequestID, EPathFollowingR
 					PlayAnimation(AttackMontage);
 					AttackTimerStart();
 				}
-				
-				/*if (CanAttack(TargetPawn))
-				{
-					ChangeState(EEnemyState::EES_Attacking);
-					// UE_LOG(LogTemp, Warning, TEXT("We are under attack!"));
-
-
-					FVector DirectionToPlayer = TargetPawn->GetActorLocation() - this->GetActorLocation();
-					
-					DrawDebugSphere(GetWorld(), DirectionToPlayer, 30.f, 12, FColor::Blue, false, 3.f);
-					DirectionToPlayer.Normalize();
-
-					DrawDebugLine(GetWorld(), this->GetActorLocation(), this->GetActorLocation() + DirectionToPlayer * 50.f, FColor::Red, false, 3.f);
-					DrawDebugSphere(GetWorld(), this->GetActorLocation() + DirectionToPlayer * 50, 30.f, 12, FColor::Red, false, 3.f);
-					// UE_LOG(LogTemp, Warning, TEXT("%f, %f, %f"), DirectionToPlayer.X, DirectionToPlayer.Y, DirectionToPlayer.Z);
-
-					const FRotator NewRotation = DirectionToPlayer.Rotation();
-
-					UE_LOG(LogTemp, Warning, TEXT(" 원래 방향 : %s"), *this->GetActorRotation().ToString());
-					this->FaceRotation(NewRotation, 0);
-					// this->SetActorRotation(NewRotation);
-					UE_LOG(LogTemp, Warning, TEXT(" 조정 후  방향 : %s"), *NewRotation.ToString());
-					
-					
-					PlayAnimation(AttackMontage);
-					AttackTimerStart();
-
-					
-				}
-				else
-				{
-					// MoveToPoint(TargetPoint);
-				}
-			}
-			else
-			{
-				const float RandomTime = FMath::RandRange(1.f, 5.f);
-				GetWorld()->GetTimerManager().SetTimer(PatrolTimer, this, &AEnemyCharacter::CreateNewPatrolJob, RandomTime);
-			}*/
 			}
 		}
 	}
@@ -216,10 +182,9 @@ void AEnemyCharacter::EnemyMoveCompleted(FAIRequestID RequestID, EPathFollowingR
 void AEnemyCharacter::PlayerDetected(APawn* TargetActor)
 {
 	// if(EnemyState == EEnemyState::EES_Dead || EnemyState == EEnemyState::EES_Chasing) return;
-	if(EnemyState == EEnemyState::EES_Dead) return;
+	if(EnemyState == EEnemyState::EES_Dead || !TargetActor->ActorHasTag("Player")) return;
 	UE_LOG(LogTemp, Warning, TEXT("플레이어 디텍트 이름 : %s"), *TargetActor->GetName());
-
-	// auto TP = Cast<AActor>(TargetActor);
+	
 		
 	TargetPawn = ChooseTargetActor(TargetActor);
 	ChangeSpeed(RunSpeed);

@@ -9,7 +9,6 @@
 #include "PlayerCharacter.generated.h"
 
 class UHUD_InventorySystem;
-class UInventoryItemHUD;
 class UInventorySystemHUD;
 class UInventoryComponent;
 class AObstacles;

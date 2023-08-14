@@ -179,14 +179,23 @@ void ABaseWeapon::GunFire(const FHitResult &HitResult, AActor* Player)
 	// 총구 위치 구하기
 	FirePointVector = FirePoint->GetComponentLocation();
 
+
 	// 총구와 사격 지점 사이에 물체가 있는지 확인하는 LineTrace
 	FHitResult WeaponHitResult;
 	FireStartPoint = FirePointVector;
 	FireEndPoint = HitResult.Location;
 
+
+	// SlaveAI 블루프린트를 위한 Case  
+	if(!HitResult.bBlockingHit)
+	{
+		FireEndPoint = FireStartPoint + GetActorForwardVector() * 1500.f;
+	}
+
 	// 총구 위치 - 사격 End Point 사이에 물체가 있으면 WeaponHitResult에 찍히게 될 것임.
 	// 크로스헤어에서 발사한 LineTrace와 총구에서 발사한 LineTrace의 ImpactPoint가 같지 않다면, 최종 LineTrace의 도착 위치를 총구에서 발사한 ImpactPoint로 바꿔주어야함!
 	GetWorld()->LineTraceSingleByChannel(WeaponHitResult, FireStartPoint, FireEndPoint, ECC_Visibility);
+
 	// 총구와 사격 지점사이에 물체가 있다면, TargetPoint를 바꿔주고 그렇지 않다면 원래 위치에 사격 효과를 준다.
 
 	// 둘 사이에 물체가 없다면 기존 HitResult를 넘기고, 물체가 있다면 WeaponHitResult를 넘김 
@@ -201,7 +210,7 @@ void ABaseWeapon::GunFire(const FHitResult &HitResult, AActor* Player)
 		HitAndEffects(HitResult, Player);
 	}
 
-	DrawDebugLine(GetWorld(), FireStartPoint, FireEndPoint, FColor::Orange, false, 2.5f);
+	DrawDebugLine(GetWorld(), FireStartPoint, FireEndPoint, FColor::Blue, false, 1.5f);
 
 	// 총알 개수 감소
 	DecreaseBulletCount();

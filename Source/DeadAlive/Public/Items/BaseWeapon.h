@@ -30,7 +30,10 @@ public :
 	void PlayFireMuzzleEffect();
 	void HitAndEffects(const FHitResult& HitResult, AActor* Player);
 	void FireEffectPlay(const FHitResult& HitResult);
+	
+	UFUNCTION(BlueprintCallable)
 	void GunFire(const FHitResult &HitResult, AActor* Player);
+	
 	void DecreaseBulletCount();
 	FORCEINLINE UWeaponAttributes* GetWeaponAttributes() const { return WeaponAttributes; }
 	FORCEINLINE FName GetReloadMontageSection() const { return ReloadMontageSection; }

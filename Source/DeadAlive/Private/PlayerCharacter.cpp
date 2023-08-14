@@ -17,7 +17,6 @@
 #include "Items/Obstacles.h"
 #include "CustomComponent/InventoryComponent.h"
 #include "HUD/Inventory/HUD_InventorySystem.h"
-#include "HUD/Inventory/InventorySystemHUD.h"
 #include "Kismet/GameplayStatics.h"
 
 /*

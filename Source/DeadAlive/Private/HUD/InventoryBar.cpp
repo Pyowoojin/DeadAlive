@@ -11,7 +11,6 @@ UInventoryBar::UInventoryBar(const FObjectInitializer &ObjectInitializer) : Supe
 	{
 		SlotCheck[i] = false;
 	}
-
 	
 }
 
