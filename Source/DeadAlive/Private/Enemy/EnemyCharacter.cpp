@@ -172,11 +172,12 @@ void AEnemyCharacter::EnemyMoveCompleted(FAIRequestID RequestID, EPathFollowingR
 					
 					if(auto HittedPawn = Cast<IHitInterface>(TargetPawn))
 					{
-						HittedPawn->GetHit(FVector(0.f, 0.f, 0.f), this, this->CharAttribute->GetEquippedWeapon()->GetWeaponDamage());
+						CharAttribute->GetEquippedWeapon()->DamageApply(HittedPawn, this);
 					}
 					
 					PlayAnimation(AttackMontage);
 					AttackTimerStart();
+					UGameplayStatics::PlaySoundAtLocation(this, AttackSound, this->GetActorLocation(), this->GetActorRotation());
 				}
 			}
 		}
@@ -218,6 +219,10 @@ void AEnemyCharacter::ChangeTarget(APawn* TargetActor)
 {
 	if(AIController && EnemyState != EEnemyState::EES_Dead)
 	{
+		if(!TargetActor->ActorHasTag("Player"))
+		{
+			
+		}
 		TargetPawn = TargetActor;
 
 		// problem /  문제
@@ -260,13 +265,6 @@ void AEnemyCharacter::Tick(float DeltaTime)
 void AEnemyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-}
-
-float AEnemyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
-	AActor* DamageCauser)
-{
-	const float RealDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-	return RealDamage;
 }
 
 FRotator AEnemyCharacter::ReturnRandomRotation() const
@@ -341,6 +339,13 @@ void AEnemyCharacter::SpawnDefaultWeapon()
 		DefaultWeapon->Equip(GetMesh(), FName("ZombieWeaponSocket"), this, this);
 		CharAttribute->SetEquippedWeapon(DefaultWeapon);
 	}
+}
+
+float AEnemyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
+	AActor* DamageCauser)
+{
+	const float RealDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	return RealDamage;
 }
 
 void AEnemyCharacter::GetHit(const FVector& ImpactPoint, AActor* Hitter, const float TakenDamage)

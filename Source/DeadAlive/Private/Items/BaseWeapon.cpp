@@ -214,7 +214,7 @@ void ABaseWeapon::GunFire(const FHitResult &HitResult, AActor* Player)
 		HitAndEffects(HitResult, Player);
 	}
 
-	DrawDebugLine(GetWorld(), FireStartPoint, FireEndPoint, FColor::Blue, false, 1.5f);
+	// DrawDebugLine(GetWorld(), FireStartPoint, FireEndPoint, FColor::Blue, false, 1.5f);
 
 	// 총알 개수 감소
 	DecreaseBulletCount();
