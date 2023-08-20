@@ -128,7 +128,8 @@ void APlayerCharacter::BeginPlay()
 	if (const APlayerController* PlayerController = Cast<APlayerController>(GetController()))
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer())) {
-			Subsystem->AddMappingContext(InputMapping, 0);
+			Subsystem->AddMappingContext(InputMapping, 1);
+			Subsystem->AddMappingContext(InteractMapping, 0);
 		}
 	}
 
@@ -194,7 +195,7 @@ void APlayerCharacter::TraceForItems()
 			{
 				// 위젯 활성화
 				HitItem->GetPickupWidget()->SetVisibility(true);
-				HitItem->EnableCustomDepth();
+				// HitItem->EnableCustomDepth();
 				
 			}
 			/* 다음 프레임을 위한 HitItem 레퍼런스 저장
@@ -210,7 +211,7 @@ void APlayerCharacter::TraceForItems()
 					if(TraceHitLastFrame->GetPickupWidget())
 					{
 						TraceHitLastFrame->GetPickupWidget()->SetVisibility(false);
-						TraceHitLastFrame->DisableCustomDepth();
+						// TraceHitLastFrame->DisableCustomDepth();
 					}
 				}
 			}
@@ -222,7 +223,7 @@ void APlayerCharacter::TraceForItems()
 	{
 		// No longer overlapping any Items
 		TraceHitLastFrame->GetPickupWidget()->SetVisibility(false);
-		TraceHitLastFrame->DisableCustomDepth();
+		// TraceHitLastFrame->DisableCustomDepth();
 	}
 }
 
@@ -875,6 +876,14 @@ void APlayerCharacter::LoadBlueprintFunc()
 	}
 }
 
+void APlayerCharacter::InteractWithSwitch()
+{
+	if(GetCharAttribute()->GetOverlappedItem() == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("인터렉트위드스위치"));
+	}
+}
+
 void APlayerCharacter::DrawLineOfObstacles()
 {
 	// 오브젝트 설치키가 꺼졌다면 함수 종료
@@ -976,6 +985,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	Input->BindAction(PlaceObstacle,  ETriggerEvent::Started, this, &APlayerCharacter::PlaceObject);
 	Input->BindAction(TabKey_Inventory, ETriggerEvent::Started, this, &APlayerCharacter::ShowInventory);
 	Input->BindAction(LoadBlueprint, ETriggerEvent::Started, this, &APlayerCharacter::LoadBlueprintFunc);
+	Input->BindAction(InteractSwitch, ETriggerEvent::Started, this, &APlayerCharacter::InteractWithSwitch);
 }
 
 void APlayerCharacter::GetHit(const FVector& ImpactPoint, AActor* Hitter, const float TakenDamage)

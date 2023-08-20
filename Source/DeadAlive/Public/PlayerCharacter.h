@@ -122,6 +122,8 @@ private:
 	ECombatState CombatState = ECombatState::ECS_Unoccupied;
 
 	FORCEINLINE APlayerController* GetPlayerController_Custom() { return GetWorld()->GetFirstPlayerController(); }
+
+	// Input Functions
 	
 	bool CanIShoot() const;
 	void SetWeapon(ABaseWeapon* Item);
@@ -138,6 +140,7 @@ private:
 	void PutDownWeapon();
 	void ChangeWeaponByNumKey(const int32 Num);
 	void LoadBlueprintFunc();
+	void InteractWithSwitch();
 
 	// InputMode 변경
 	void SetInputModeUIOnly();
@@ -200,12 +203,16 @@ private:
 	UInputAction* TabKey_Inventory;
 	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputAction* LoadBlueprint;
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* InteractSwitch;
 	
-
 	
 	
 	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputMappingContext* InputMapping;
+
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputMappingContext* InteractMapping;
 
 	// 애니메이션 몽타주
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))

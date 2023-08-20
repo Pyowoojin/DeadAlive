@@ -33,8 +33,12 @@ public :
 	
 	UFUNCTION(BlueprintCallable)
 	void GunFire(const FHitResult &HitResult, AActor* Player);
+
+	UFUNCTION(BlueprintCallable)
+	void GunFireForAI(FHitResult &HitResult, AActor* Shooter, FVector AimingPoint);
 	
 	void DecreaseBulletCount();
+	UFUNCTION(BlueprintCallable)
 	FORCEINLINE UWeaponAttributes* GetWeaponAttributes() const { return WeaponAttributes; }
 	FORCEINLINE FName GetReloadMontageSection() const { return ReloadMontageSection; }
 

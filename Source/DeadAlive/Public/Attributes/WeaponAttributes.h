@@ -18,7 +18,8 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	FORCEINLINE float GetFireRate() const { return AutomaticFireRate; }
 	FORCEINLINE FString GetItemName() { return ItemName; }
-	FORCEINLINE void SetRemainedAmmoCount(int32 RefillAmmoCount) { RemainedBulletCount += RefillAmmoCount; } 
+	FORCEINLINE void SetRemainedAmmoCount(int32 RefillAmmoCount) { RemainedBulletCount += RefillAmmoCount; }
+	UFUNCTION(BlueprintCallable)
 	FORCEINLINE int32 GetAmmoCount() const { return RemainedBulletCount; }
 	// 최대 총알 - 현재 총알
 	FORCEINLINE int32 GetNeedAmmoCount() const { return MaxBulletCount - RemainedBulletCount; }

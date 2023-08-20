@@ -42,7 +42,7 @@ void ABaseWeapon::BeginPlay()
 	{
 		WeaponInfo->SetItemName(WeaponAttributes->GetItemName());
 	}
-	DisableCustomDepth();
+	// DisableCustomDepth();
 }
 
 // 아이템을 버림
@@ -66,28 +66,14 @@ void ABaseWeapon::ItemAcquisition(USceneComponent* InParent, AActor* NewOwner)
 		const FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
 		this->AttachToComponent(InParent, AttachmentRules, FName("RightHandWeaponSocket"));
 	}
-	
+
+	DisableCustomDepth();
 	// 아이템 피직스와 콜라이더 설정 변경
 	this->Owner = NewOwner;
 	SetCollisionWhenItemChangeOFF();
 
 	SKM->SetVisibility(true);
 	SetItemState(EItemState::EIS_Equipped);
-}
-
-// 변경될 무기 (Old Weapon) : 슬롯에 들어갈 무기를 말함 ★ Old Weapon ★
-void ABaseWeapon::SetCollisionWhenItemChangeOFF()
-{
-	// 물리 효과, OverlapSphere들 전부 끄고
-	SKM->SetSimulatePhysics(false);
-	SKM->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	SKM->SetVisibility(false);
-	SphereCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	NoticeSphereCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
-	// 아이템 상태 변경하기 Free -> Equipped
-	SetItemState(EItemState::EIS_UnEquipped);
-	
 }
 
 // 아이템을 다시 떨어트릴 때 -> 콜리전, 시뮬레이션을 모아놓은 함수
@@ -103,7 +89,23 @@ void ABaseWeapon::SetCollisionWhenItemDivestiture()
 		SphereCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 		NoticeSphereCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 		SetItemState(EItemState::EIS_Free);
+		EnableCustomDepth();
 	}
+}
+
+// 변경될 무기 (Old Weapon) : 슬롯에 들어갈 무기를 말함 ★ Old Weapon ★
+void ABaseWeapon::SetCollisionWhenItemChangeOFF()
+{
+	// 물리 효과, OverlapSphere들 전부 끄고
+	SKM->SetSimulatePhysics(false);
+	SKM->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	SKM->SetVisibility(false);
+	SphereCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	NoticeSphereCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	// 아이템 상태 변경하기 Free -> Equipped
+	SetItemState(EItemState::EIS_UnEquipped);
+	
 }
 
 // 변경된 무기 (New Weapon) : 이제 바꾸는 무기를 말함
@@ -135,6 +137,7 @@ void ABaseWeapon::IPickUpItem(ABaseItem* Item, APlayerCharacter* Player)
 		
 	Player->GetCharAttribute()->SetEquippedWeapon(this);
 	ItemAcquisition(Player->GetMesh(), Player);
+	DisableCustomDepth();
 }
 
 void ABaseWeapon::PlayFireSound()
@@ -176,6 +179,7 @@ void ABaseWeapon::HitAndEffects(const FHitResult& HitResult, AActor* Player)
 // Play FireSound and FireFlash 
 void ABaseWeapon::GunFire(const FHitResult &HitResult, AActor* Player)
 {
+	if(!this->GetWeaponAttributes()->GetAmmoCount()) return;
 	// 총구 위치 구하기
 	FirePointVector = FirePoint->GetComponentLocation();
 
@@ -217,6 +221,17 @@ void ABaseWeapon::GunFire(const FHitResult &HitResult, AActor* Player)
 	
 }
 
+void ABaseWeapon::GunFireForAI(FHitResult& HitResult, AActor* Shooter, FVector AimingPoint)
+{
+	FireStartPoint = FirePoint->GetComponentLocation();
+	const FVector TargetPoint = (AimingPoint - FireStartPoint).GetSafeNormal();
+	GetWorld()->LineTraceSingleByChannel(HitResult, FireStartPoint, AimingPoint, ECC_Visibility);
+	DrawDebugLine(GetWorld(), FireStartPoint, AimingPoint, FColor::Orange, false, 1.5f);
+
+	if(HitResult.bBlockingHit)
+		HitAndEffects(HitResult, Shooter);
+}
+
 void ABaseWeapon::FireEffectPlay(const FHitResult& HitResult)
 {
 	/*if(HitResult.GetActor())
@@ -233,7 +248,8 @@ void ABaseWeapon::FireEffectPlay(const FHitResult& HitResult)
 		}
 		else
 		{
-			UGameplayStatics::SpawnEmitterAtLocation(this, ShootParticle, FireEndPoint);
+			// UGameplayStatics::SpawnEmitterAtLocation(this, ShootParticle, FireEndPoint);
+			UGameplayStatics::SpawnEmitterAtLocation(this, ShootParticle, HitResult.ImpactPoint);
 			/*const FString ActorName = HitResult.GetActor()->GetName();
 			UE_LOG(LogTemp, Error, TEXT("%s"), *ActorName);*/
 			// DrawDebugSphere(GetWorld(), HitResult.Location, 15.f, 16, FColor::Blue, false, 5.f);

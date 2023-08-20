@@ -165,11 +165,15 @@ void AEnemyCharacter::EnemyMoveCompleted(FAIRequestID RequestID, EPathFollowingR
 
 					const FRotator NewRotation = DirectionToPlayer.Rotation();
 
-					UE_LOG(LogTemp, Warning, TEXT(" 원래 방향 : %s"), *this->GetActorRotation().ToString());
+					// UE_LOG(LogTemp, Warning, TEXT(" 원래 방향 : %s"), *this->GetActorRotation().ToString());
 					this->FaceRotation(NewRotation, 0);
 					// this->SetActorRotation(NewRotation);
-					UE_LOG(LogTemp, Warning, TEXT(" 조정 후  방향 : %s"), *NewRotation.ToString());
+					// UE_LOG(LogTemp, Warning, TEXT(" 조정 후  방향 : %s"), *NewRotation.ToString());
 					
+					if(auto HittedPawn = Cast<IHitInterface>(TargetPawn))
+					{
+						HittedPawn->GetHit(FVector(0.f, 0.f, 0.f), this, this->CharAttribute->GetEquippedWeapon()->GetWeaponDamage());
+					}
 					
 					PlayAnimation(AttackMontage);
 					AttackTimerStart();
@@ -183,7 +187,7 @@ void AEnemyCharacter::PlayerDetected(APawn* TargetActor)
 {
 	// if(EnemyState == EEnemyState::EES_Dead || EnemyState == EEnemyState::EES_Chasing) return;
 	if(EnemyState == EEnemyState::EES_Dead || !TargetActor->ActorHasTag("Player")) return;
-	UE_LOG(LogTemp, Warning, TEXT("플레이어 디텍트 이름 : %s"), *TargetActor->GetName());
+	// UE_LOG(LogTemp, Warning, TEXT("플레이어 디텍트 이름 : %s"), *TargetActor->GetName());
 	
 		
 	TargetPawn = ChooseTargetActor(TargetActor);
@@ -250,6 +254,7 @@ FVector AEnemyCharacter::CalcNextMovementLocation(FNavLocation& DestLocation)
 void AEnemyCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	if(bIsDead) return;
 
 }
 void AEnemyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -344,7 +349,7 @@ void AEnemyCharacter::GetHit(const FVector& ImpactPoint, AActor* Hitter, const f
 	
 	if(const auto Target = Cast<APawn>(Hitter))
 	{
-		//PlayerDetected(Target);
+		// PlayerDetected(Target);
 		ChangeTarget(Target);
 	}
 	
@@ -414,6 +419,6 @@ bool AEnemyCharacter::TargetIsInRange(APawn* TargetActor, double Radius)
 	if(TargetActor == nullptr) return false;
 	
 	const double DistanceToTarget = (TargetActor->GetActorLocation() - GetActorLocation()).Size();
-	UE_LOG(LogTemp, Warning, TEXT("액터와의 거리 : %f, AttackRadiance : %f"), DistanceToTarget, AttackRange);
+	// UE_LOG(LogTemp, Warning, TEXT("액터와의 거리 : %f, AttackRadiance : %f"), DistanceToTarget, AttackRange);
 	return DistanceToTarget <= Radius;
 }
