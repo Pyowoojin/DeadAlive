@@ -42,6 +42,7 @@ void ABaseItem::BeginPlay()
 	NoticeSphereCollision->OnComponentBeginOverlap.AddDynamic(this, &ABaseItem::NoticeRangeBeginOverlap);
 	NoticeSphereCollision->OnComponentEndOverlap.AddDynamic(this, &ABaseItem::NoticeRangeOverlapEnd);
 
+	// 니 전화 바로 픽업
 	// 픽업 위젯 숨기기
 	if(PickupWidget)
 	{
