@@ -9,7 +9,7 @@ TPS 형식의 슈팅 호러 게임
 _**심약자에게 충격적인 장면이 포함되어 있으니 플레이 시 주의를 요합니다.**_
 
 # 🎮**Preview**
-![KakaoTalk_20230915_183537602](https://github.com/Pyowoojin/DeadAlive/assets/66067291/20129e56-6c09-4bae-9efd-ce428badba23)
+![KakaoTalk_20230915_183537602](https://github.com/Pyowoojin/DeadAlive/assets/66067291/a22b978b-bc52-4a7a-be41-1fd8d84f4371)
 
 
 # 🕹 **Controll**
